@@ -74,25 +74,28 @@ class CartPoleEnv(gym.Env):
         M = self.cart_mass
         L = self.pole_length
         g = self.gravity
-
+        
+        # Grab States
         x1 = self._cart_position # x
         x2 = self._cart_velocity # x_dot
         x3 = self._pole_angle # theta
         x4 = self._pole_angular_velocity #theta_dot
         
-        x1_dot= x2
-        x2_dot = -mp * L * np.sin(x3) * np.square(x4) + mp * g * np.cos(x3) * np.sin(x4) + force / (M + mp * np.square(np.sin(x3)))
-        x3_dot = x4
-        x4_dot = -(M + mp) * g * np.sin(x3) - mp * L * np.sin(x3) * np.cos(x3) * np.square(x4) - force * np.cos(x3) / (L * (M + mp * np.square(np.sin(x3))) )
-
-        self.update_states()
-        # update position, velocities with x[1-4] dot?
-        x = x + x_dot * delta_time
+        # Get Derivatives
+        x1_dot= x2 # cart vel
+        x2_dot = -mp * L * np.sin(x3) * np.square(x4) + mp * g * np.cos(x3) * np.sin(x4) + force / (M + mp * np.square(np.sin(x3))) # cart acceleration
+        x3_dot = x4 # angular velocity
+        x4_dot = -(M + mp) * g * np.sin(x3) - mp * L * np.sin(x3) * np.cos(x3) * np.square(x4) - force * np.cos(x3) / (L * (M + mp * np.square(np.sin(x3))) ) # angular acceleration
         
-        theta = theta + theta_dot * delta_time
+        # Use integrator to get next state
+        state = self.rk4_integrator([x1,x2,x3,x4], [x1_dot, x2_dot, x3_dot, x4_dot], time, delta_time)
 
         # reward = 1 if self._pole_angle equals 0
+        reward = 1
+        terminated = False # if pole falls (>= 30 deg), time duration (10 sec, <=30 deg)
+        truncated = False
+        info = None
 
-        observations = self._get_obs()
+        observations = state
 
-        return observations, reward, terminated, False, {}
+        return observations, reward, terminated, truncated, info
