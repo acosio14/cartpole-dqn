@@ -4,6 +4,7 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 from scipy.integrate import odeint
+from utils.numerical_integrators import runge_kutta_fourth_order
 
 
 class CartPoleEnv(gym.Env):
@@ -99,7 +100,7 @@ class CartPoleEnv(gym.Env):
                 
         # Use integrator to get next state
         # Maybe rk4_integrator should be in a utils
-        state = self.rk4_integrator(x, x_dot, time, delta_time) # basically: state = state + state_dot * dt
+        state = runge_kutta_fourth_order(x, x_dot, time, delta_time) # basically: state = state + state_dot * dt
 
         # reward = 1 if self._pole_angle equals 0
         reward = 1
