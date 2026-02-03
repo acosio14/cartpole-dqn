@@ -22,7 +22,12 @@ class CartPoleEnv(gym.Env):
         self._pole_angle = 0.0
         self._pole_angular_velocity = 0.0
 
-        # self.numerical_integrator ("original CartPole used: euler")
+        self.state = [
+            self._cart_position,
+            self._cart_velocity,
+            self._pole_angle,
+            self._pole_angular_velocity,
+        ]
         
         # observation and action space
         self.observation_space = spaces.Dict(
@@ -66,29 +71,35 @@ class CartPoleEnv(gym.Env):
 
         return self._get_obs()
     
-    def step(self, action):
-
-        force = action # action should be a force applied to cart: -F (left), +F (right), 0 (no force)
+    def ordinay_differantion_equations(self, state, force):
         
         mp = self.pole_mass
         M = self.cart_mass
         L = self.pole_length
         g = self.gravity
         
-        # Grab States
-        x1 = self._cart_position # x
-        x2 = self._cart_velocity # x_dot
-        x3 = self._pole_angle # theta
-        x4 = self._pole_angular_velocity #theta_dot
-        
         # Get Derivatives
-        x1_dot= x2 # cart vel
-        x2_dot = -mp * L * np.sin(x3) * np.square(x4) + mp * g * np.cos(x3) * np.sin(x4) + force / (M + mp * np.square(np.sin(x3))) # cart acceleration
-        x3_dot = x4 # angular velocity
-        x4_dot = -(M + mp) * g * np.sin(x3) - mp * L * np.sin(x3) * np.cos(x3) * np.square(x4) - force * np.cos(x3) / (L * (M + mp * np.square(np.sin(x3))) ) # angular acceleration
-        
+        x_dot= state[1] # cart velocity
+        x_ddot = -mp * L * np.sin(state[2]) * np.square(state[3]) + mp * g * np.cos(state[2]) * np.sin(state[3]) + force / (M + mp * np.square(np.sin(state[2]))) # cart acceleration
+        theta_dot = state[3] # angular velocity
+        theta_ddot = -(M + mp) * g * np.sin(state[2]) - mp * L * np.sin(state[2]) * np.cos(state[2]) * np.square(state[3]) - force * np.cos(state[2]) / (L * (M + mp * np.square(np.sin(state[2]))) ) # angular acceleration
+
+        return [x_dot, x_ddot, theta_dot, theta_ddot]
+    
+
+    def step(self, action, time , delta_time):
+
+        x = [
+            self._cart_position,
+            self._cart_velocity,
+            self._pole_angle,
+            self._pole_angular_velocity,
+        ]
+        x_dot = self.ordinay_differantion_equations(x, action) # action should be a force applied to cart: -F (left), +F (right), 0 (no force)
+                
         # Use integrator to get next state
-        state = self.rk4_integrator([x1,x2,x3,x4], [x1_dot, x2_dot, x3_dot, x4_dot], time, delta_time)
+        # Maybe rk4_integrator should be in a utils
+        state = self.rk4_integrator(x, x_dot, time, delta_time) # basically: state = state + state_dot * dt
 
         # reward = 1 if self._pole_angle equals 0
         reward = 1
