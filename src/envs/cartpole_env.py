@@ -103,13 +103,12 @@ class CartPoleEnv(gym.Env):
             self._cart_velocity,
             self._pole_angle,
             self._pole_angular_velocity,
-        ]
-        x_dot = self.ordinay_differantion_equations(x, action) # action should be a force applied to cart: -F (left), +F (right), 0 (no force)
-                
+        ]      
         # Use integrator to get next state
         # Maybe rk4_integrator should be in a utils
         # if statement to select numerical integrator, args into this if (or function)
-        state = runge_kutta_fourth_order(x, x_dot, delta_time) # basically: state = state + state_dot * dt
+        df = self.ordinay_differantion_equations()
+        state = runge_kutta_fourth_order(df, x, action, delta_time) # basically: state = state + state_dot * dt
 
         # reward = 1 if self._pole_angle equals 0
         reward = 1
