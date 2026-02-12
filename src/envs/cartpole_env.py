@@ -81,9 +81,17 @@ class CartPoleEnv(gym.Env):
         
         # Get Derivatives
         x_dot= state[1] # cart velocity
-        x_ddot = -mp * L * np.sin(state[2]) * np.square(state[3]) + mp * g * np.cos(state[2]) * np.sin(state[3]) + force / (M + mp * np.square(np.sin(state[2]))) # cart acceleration
+        x_ddot = (
+            -mp * L * np.sin(state[2]) * np.square(state[3])
+            + mp * g * np.cos(state[2]) * np.sin(state[3])
+            + force / (M + mp * np.square(np.sin(state[2]))) 
+        ) # cart acceleration
         theta_dot = state[3] # angular velocity
-        theta_ddot = -(M + mp) * g * np.sin(state[2]) - mp * L * np.sin(state[2]) * np.cos(state[2]) * np.square(state[3]) - force * np.cos(state[2]) / (L * (M + mp * np.square(np.sin(state[2]))) ) # angular acceleration
+        theta_ddot = (
+            -(M + mp) * g * np.sin(state[2]) 
+            - mp * L * np.sin(state[2]) * np.cos(state[2]) * np.square(state[3]) 
+            - force * np.cos(state[2]) / (L * (M + mp * np.square(np.sin(state[2]))) ) 
+        )# angular acceleration
 
         return [x_dot, x_ddot, theta_dot, theta_ddot]
     
@@ -100,7 +108,8 @@ class CartPoleEnv(gym.Env):
                 
         # Use integrator to get next state
         # Maybe rk4_integrator should be in a utils
-        state = runge_kutta_fourth_order(x, x_dot, time, delta_time) # basically: state = state + state_dot * dt
+        # if statement to select numerical integrator, args into this if (or function)
+        state = runge_kutta_fourth_order(x, x_dot, delta_time) # basically: state = state + state_dot * dt
 
         # reward = 1 if self._pole_angle equals 0
         reward = 1
