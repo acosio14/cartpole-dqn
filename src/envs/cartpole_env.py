@@ -111,9 +111,9 @@ class CartPoleEnv(gym.Env):
 
         # reward = 1 if self._pole_angle equals 0
         if state[2] == 0:
-            reward =+ 1
+            reward = 1.0
         else:
-            reward =- 0.01
+            reward = -0.01
 
         if state[2] >= 30 or time >= 10:
             terminated = True # if pole falls (>= 30 deg), time duration (10 sec, <=30 deg)
