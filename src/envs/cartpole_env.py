@@ -96,7 +96,7 @@ class CartPoleEnv(gym.Env):
         return [x_dot, x_ddot, theta_dot, theta_ddot]
     
 
-    def step(self, action, time , delta_time):
+    def step(self, action, time, timestep):
 
         x = [
             self._cart_position,
@@ -104,18 +104,21 @@ class CartPoleEnv(gym.Env):
             self._pole_angle,
             self._pole_angular_velocity,
         ]      
-        # Use integrator to get next state
-        # Maybe rk4_integrator should be in a utils
-        # if statement to select numerical integrator, args into this if (or function)
-        df = self.ordinay_differantion_equations()
-        state = runge_kutta_fourth_order(df, x, action, delta_time) # basically: state = state + state_dot * dt
+
+        xdot = self.ordinay_differantion_equations()
+        state = runge_kutta_fourth_order(xdot, x, action, timestep) # basically: state = state + state_dot * dt
+        observations = state
 
         # reward = 1 if self._pole_angle equals 0
-        reward = 1
-        terminated = False # if pole falls (>= 30 deg), time duration (10 sec, <=30 deg)
+        if state[2] == 0:
+            reward =+ 1
+        else:
+            reward =- 0.01
+
+        if state[2] >= 30 or time >= 10:
+            terminated = True # if pole falls (>= 30 deg), time duration (10 sec, <=30 deg)
+        
         truncated = False
         info = None
-
-        observations = state
 
         return observations, reward, terminated, truncated, info
