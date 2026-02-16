@@ -40,13 +40,13 @@ class CartPoleEnv(gym.Env):
                 "pole_angular_velocity": spaces.Box(-np.inf, np.inf, shape=(1,), dtype=np.float32),
             }
         )
-        self.action_space = spaces.Discrete(5)
+        self.action_space = spaces.Discrete(5) # Discrete(5) -> [0,1,2,3,4]
         self._action_to_forces = {
-            "left_hard": -10, 
-            "left": -5, 
-            "stop": 0, 
-            "right": 5, 
-            "right_hard": 10
+            0: -10, 
+            1: -5, 
+            2: 0, 
+            3: 5, 
+            4: 10
         }
 
     def _get_obs(self):
