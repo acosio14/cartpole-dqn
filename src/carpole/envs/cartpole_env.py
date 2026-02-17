@@ -41,13 +41,7 @@ class CartPoleEnv(gym.Env):
             }
         )
         self.action_space = spaces.Discrete(5) # Discrete(5) -> [0,1,2,3,4]
-        self._action_to_forces = {
-            0: -10, 
-            1: -5, 
-            2: 0, 
-            3: 5, 
-            4: 10
-        }
+        self.force = [-10, -5, 0, 5, 10]
 
     def _get_obs(self):
         """Convert internal state to observation format.
