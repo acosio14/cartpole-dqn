@@ -6,4 +6,7 @@ class ReplayBuffer(deque):
         super().__init__(maxlen=maxlen)
 
     def sample(self, batch_size):
+        if len(self) == 0:
+            return ValueError("Replay Buffer is empty")
+        
         return random.sample(self, min(batch_size, len(self)))
