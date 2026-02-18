@@ -5,7 +5,7 @@ class ReplayBuffer(deque):
     def __init__(self, maxlen):
         super().__init__(maxlen=maxlen)
         self.maxlen = maxlen
-        self._is_full = False
+        self.is_full = False
 
     def sample(self, batch_size):
         if len(self) == 0:
@@ -15,4 +15,4 @@ class ReplayBuffer(deque):
     
     def _is_maxlen(self):
         if len(self) == self.maxlen:
-            self._is_full = True
+            self.is_full = True
