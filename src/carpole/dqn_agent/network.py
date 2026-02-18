@@ -3,11 +3,11 @@ import torch
 import torch.nn as nn
 
 class DQN(nn.Module):
-    def __init__(self):
+    def __init__(self, input_dim, output_dim):
         super().__init__()
-        self.fc1 = nn.Linear(4,128)
+        self.fc1 = nn.Linear(input_dim,128)
         self.fc2 = nn.Linear(128,128)
-        self.fc3 = nn.Linear(128,1)
+        self.fc3 = nn.Linear(128,output_dim)
     
     def forward(self, states):
         x = nn.ReLU(self.fc1(states))
