@@ -1,4 +1,6 @@
 class Trainner():
     def __init__(self):
         ...
-        # Training Loop
+    
+    def train(self):
+        ...
