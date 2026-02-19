@@ -31,7 +31,7 @@ class CartPoleAgent():
         if np.random.random() < self.epsilon:
             action = self.env.action_space.sample() # action_space = [0, 1, 2, 3, 4] mapped to [-10, -5, 0, 5, 10]
         else:
-            q_values = self.policy_network(state)
+            q_values = self.policy_network(state) # returns (values, indicies)
             action = torch.argmax(q_values).item() # return the best value's indicies (only 1)
 
         return action
@@ -49,7 +49,7 @@ class CartPoleAgent():
         # (value, indicies) -> [0] = only values
         max_q_values = self.target_network(next_state).max(1)[0] # A batch of values
         target_q_values = reward + self.discount_factor * max_q_values * (1 - terminated)
-        q_values =  self.policy_network(state)
+        q_values =  self.policy_network(state).gather(1,action).squeeze()
 
         loss = F.mse_loss(q_values, target_q_values)
         loss.backward()
