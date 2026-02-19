@@ -3,7 +3,7 @@ import random
 
 class ReplayBuffer(deque):
     def __init__(self, maxlen):
-        super().__init__(maxlen=maxlen)
+        super().__init__(maxlen=10000)
         self.maxlen = maxlen
         self.is_full = False
 
