@@ -43,7 +43,7 @@ class Trainer():
                 memory.append(
                     state, action, reward, next_state, terminated,
                 )
-                
+
                 # Update state
                 state = next_state
                 episode_reward =+ reward
@@ -59,3 +59,7 @@ class Trainer():
                 # Update target network periodically
                 total_steps =+ step
                 self.agent.update_target_network(total_steps, update_frequency=60)
+            
+            self.agent.epsilon = self.agent.decay_epsilon(step)
+
+            rewards.append(episode_reward)
