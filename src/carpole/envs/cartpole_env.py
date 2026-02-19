@@ -107,19 +107,18 @@ class CartPoleEnv(gym.Env):
         ]      
 
         xdot = self.ordinay_differantion_equations()
-        state = runge_kutta_fourth_order(xdot, x, action, timestep) # basically: state = state + state_dot * dt
-        observations = state
+        next_state = runge_kutta_fourth_order(xdot, x, action, timestep) # basically: state = state + state_dot * dt
 
         # reward = 1 if self._pole_angle equals 0
-        if state[2] == 0:
+        if next_state[2] == 0:
             reward = 1.0
         else:
             reward = -0.01
 
-        if state[2] >= 30 or time >= 10:
+        if next_state[2] >= 30 or time >= 10:
             terminated = True # if pole falls (>= 30 deg), time duration (10 sec, <=30 deg)
         
         truncated = False
         info = None
 
-        return observations, reward, terminated, truncated, info
+        return next_state, reward, terminated, truncated, info
