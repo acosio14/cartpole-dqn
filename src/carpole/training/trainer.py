@@ -52,31 +52,27 @@ class Trainer():
             while not terminated:
                 # Select action
                 action = self.agent.select_action(state, self.epsilon)
-                state, reward, terminated, _, _ = self.environment.step()
+
+                #step takes (action,time,timestep) - What is time and timestep?
+                next_state, reward, terminated, _, _ = self.environment.step(action)
 
                 # Store transition in memory
-                memory.append(
-                    state, action, reward, next_state, terminated,
-                )
+                memory.append(state, action, reward, next_state, terminated)
 
                 # Update state
                 state = next_state
                 episode_reward =+ reward
 
                 # Optimize model
-                state, action, reward, next_state, terminated = (
-                    memory.sample(self.batch_size)
-                )
-                self.agent.update(
-                    state, action, reward, next_state, terminated,
-                )
+                # state, action, reward, next_state, terminated = mini_batches
+                mini_batches = memory.sample(self.batch_size)
+                self.agent.update_q_values(*mini_batches)
                 
                 # Update target network periodically
                 total_steps =+ step
                 self.agent.update_target_network(total_steps, self.frequency_rate)
             
             self.agent.epsilon = self.agent.decay_epsilon(step)
-
             rewards.append(episode_reward)
     
     def save_model(self, name):
