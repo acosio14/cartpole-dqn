@@ -3,6 +3,17 @@ from carpole.envs.cartpole_env import CartPoleEnv
 from carpole.dqn_agent.agent import CartPoleAgent
 from utils.replay_buffer import ReplayBuffer
 import torch
+from dataclasses import dataclass
+
+
+@dataclass
+class TrainingArgs:
+    learning_rate: float
+    epsilon: float
+    steps: int
+    batch_size: int
+    frequency_rate: int
+
 
 class Trainer():
     def __init__(
@@ -10,18 +21,18 @@ class Trainer():
         model: DQN,
         environment: CartPoleEnv, 
         agent: CartPoleAgent,
-        learning_rate: float,
-        epsilon: float,
-        training_data: torch.Tensor,
-        steps: int,
+        training_args: TrainingArgs,
     ):
         self.model = model
         self.environment = environment
         self.agent = agent
-        self.learning_rate = learning_rate
-        self.epsilon = epsilon
-        self.training_data = training_data
-        self.steps = steps
+
+        self.learning_rate = training_args.learning_rate
+        self.epsilon = training_args.epsilon
+        self.steps = training_args.steps
+        self.batch_size = training_args.batch_size
+        self.frequency_rate = training_args.frequency_rate
+
     
     def train(self):
 
@@ -50,7 +61,7 @@ class Trainer():
 
                 # Optimize model
                 state, action, reward, next_state, terminated = (
-                    memory.sample(batch_size)
+                    memory.sample(self.batch_size)
                 )
                 self.agent.update(
                     state, action, reward, next_state, terminated,
@@ -58,7 +69,7 @@ class Trainer():
                 
                 # Update target network periodically
                 total_steps =+ step
-                self.agent.update_target_network(total_steps, update_frequency=60)
+                self.agent.update_target_network(total_steps, self.frequency_rate)
             
             self.agent.epsilon = self.agent.decay_epsilon(step)
 
