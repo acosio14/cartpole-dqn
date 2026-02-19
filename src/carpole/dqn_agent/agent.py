@@ -36,7 +36,7 @@ class CartPoleAgent():
 
         return action
 
-    def update(self, state, action, reward, next_state, terminated):
+    def update_q_values(self, state, action, reward, next_state, terminated):
         # Sample a batch from replay_buffer
         # Compute predicted Q-values for the states and actions in the batch using policy_network
         # Compute Bellmans targets using target_network
