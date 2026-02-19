@@ -4,6 +4,8 @@ from carpole.dqn_agent.agent import CartPoleAgent
 from utils.replay_buffer import ReplayBuffer
 import torch
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
 
 
 @dataclass
@@ -13,6 +15,7 @@ class TrainingArgs:
     steps: int
     batch_size: int
     frequency_rate: int
+    output_dir: str
 
 
 class Trainer():
@@ -32,6 +35,7 @@ class Trainer():
         self.steps = training_args.steps
         self.batch_size = training_args.batch_size
         self.frequency_rate = training_args.frequency_rate
+        self.output_dir = training_args.output_dir
 
     
     def train(self):
@@ -74,3 +78,13 @@ class Trainer():
             self.agent.epsilon = self.agent.decay_epsilon(step)
 
             rewards.append(episode_reward)
+    
+    def save_model(self, name):
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        dir_path = Path('/Users/adriancosio/Projects/cartpole-dqn/results')
+        filename = f'{name}_{timestamp}.pt'
+
+        torch.save(
+            self.model.state_dict(),
+            dir_path / filename
+        )
