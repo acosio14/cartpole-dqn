@@ -22,7 +22,6 @@ class CartPoleAgent():
         self.target_network = target_network
         self.epsilon = epsilon
         self.discount_factor = discount_factor
-        self.replay_buffer = ReplayBuffer(replay_buffer_size)
         self.learning_rate = learning_rate
     
     def select_action(self, state):

@@ -18,8 +18,8 @@ def main():
     
     cartpole_env = CartPoleEnv(gravity, cart_mass_kg, pole_mass_kg, pole_len_m)
 
-    network_input_dim = len(cartpole_env.observation_space) # Discrete has no len()
-    network_output_dim = len(cartpole_env.action_space)
+    network_input_dim = len(cartpole_env.observation_space.spaces) # Discrete has no len()
+    network_output_dim = cartpole_env.action_space.n
     
     policy = DQN(network_input_dim, network_output_dim)
     target = DQN(network_input_dim, network_output_dim)
@@ -31,7 +31,6 @@ def main():
         learning_rate,
         epsilon,
         discount_factor, 
-        replay_buffer_size
     )
 
     training_args = TrainingArgs(
@@ -40,6 +39,7 @@ def main():
                         steps=10,
                         batch_size=5,
                         frequency_rate=10,
+                        replay_buffer_size=replay_buffer_size,
                         output_dir=(
                             '/Users/adriancosio/Projects/cartpole-dqn/results',
                         ),

@@ -15,6 +15,7 @@ class TrainingArgs:
     steps: int
     batch_size: int
     frequency_rate: int
+    replay_buffer_size: int
     output_dir: str
 
 
