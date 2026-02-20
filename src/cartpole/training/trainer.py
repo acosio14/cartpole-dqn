@@ -37,15 +37,16 @@ class Trainer():
         self.batch_size = training_args.batch_size
         self.frequency_rate = training_args.frequency_rate
         self.output_dir = training_args.output_dir
+        self.replay_buffer_size = training_args.replay_buffer_size
         self.rewards = []
 
     
     def train(self):
 
-        memory = ReplayBuffer()
+        memory = ReplayBuffer(self.replay_buffer_size)
         total_steps = 0
 
-        for step in self.steps:
+        for step in range(self.steps):
             state = self.environment.reset()
             episode_reward = 0
             terminated = False
