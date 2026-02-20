@@ -1,6 +1,6 @@
-from cartpole.dqn_agent.network import DQN
-from cartpole.envs.cartpole_env import CartPoleEnv
-from cartpole.dqn_agent.agent import CartPoleAgent
+from dqn_agent.network import DQN
+from envs.cartpole_env import CartPoleEnv
+from dqn_agent.agent import CartPoleAgent
 from utils.replay_buffer import ReplayBuffer
 import torch
 from dataclasses import dataclass
@@ -36,11 +36,11 @@ class Trainer():
         self.batch_size = training_args.batch_size
         self.frequency_rate = training_args.frequency_rate
         self.output_dir = training_args.output_dir
+        self.rewards = []
 
     
     def train(self):
 
-        rewards = []
         memory = ReplayBuffer()
         total_steps = 0
 
@@ -73,11 +73,11 @@ class Trainer():
                 self.agent.update_target_network(total_steps, self.frequency_rate)
             
             self.agent.epsilon = self.agent.decay_epsilon(step)
-            rewards.append(episode_reward)
+            self.rewards.append(episode_reward)
     
-    def save_model(self, name):
+    def save_model(self, name: str):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        dir_path = Path('/Users/adriancosio/Projects/cartpole-dqn/results')
+        dir_path = Path('')
         filename = f'{name}_{timestamp}.pt'
 
         torch.save(

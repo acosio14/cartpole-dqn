@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import gymnasium as gym
-from cartpole.dqn_agent.network import DQN
+from dqn_agent.network import DQN
 from utils.replay_buffer import ReplayBuffer
 import torch.nn as nn
 from torch.nn import functional as F
@@ -15,14 +15,14 @@ class CartPoleAgent():
             learning_rate: float,
             epsilon: float,
             discount_factor: float,
-            maxlen: int = 10000,
+            replay_buffer_size: int = 10000,
         ):
         self.env = env
         self.policy_network = policy_network
         self.target_network = target_network
         self.epsilon = epsilon
         self.discount_factor = discount_factor
-        self.replay_buffer = ReplayBuffer(maxlen)
+        self.replay_buffer = ReplayBuffer(replay_buffer_size)
         self.learning_rate = learning_rate
     
     def select_action(self, state):

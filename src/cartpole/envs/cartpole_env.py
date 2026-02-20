@@ -9,13 +9,13 @@ from utils.numerical_integrators import runge_kutta_fourth_order
 
 class CartPoleEnv(gym.Env):
 
-    def __init__(self):
+    def __init__(self, gravity: float, cart_mass: float, pole_mass: float, pole_length: float):
         
         # physical constants
-        self.gravity = 9.8 # m/s/s
-        self.cart_mass = 10 # kg
-        self.pole_mass = 5
-        self.pole_length = 3
+        self.gravity = gravity # m/s/s
+        self.cart_mass = cart_mass # kg
+        self.pole_mass = pole_mass
+        self.pole_length = pole_length
 
         # initalized state variables
         self._cart_position = 0.0
