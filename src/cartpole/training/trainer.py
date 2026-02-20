@@ -1,6 +1,6 @@
-from carpole.dqn_agent.network import DQN
-from carpole.envs.cartpole_env import CartPoleEnv
-from carpole.dqn_agent.agent import CartPoleAgent
+from cartpole.dqn_agent.network import DQN
+from cartpole.envs.cartpole_env import CartPoleEnv
+from cartpole.dqn_agent.agent import CartPoleAgent
 from utils.replay_buffer import ReplayBuffer
 import torch
 from dataclasses import dataclass

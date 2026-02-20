@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import gymnasium as gym
-from carpole.dqn_agent.network import DQN
+from cartpole.dqn_agent.network import DQN
 from utils.replay_buffer import ReplayBuffer
 import torch.nn as nn
 from torch.nn import functional as F
