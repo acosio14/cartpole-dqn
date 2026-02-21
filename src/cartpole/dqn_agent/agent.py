@@ -15,7 +15,6 @@ class CartPoleAgent():
             learning_rate: float,
             start_epsilon: float,
             discount_factor: float,
-            replay_buffer_size: int = 10000,
         ):
         self.env = env
         self.policy_network = policy_network

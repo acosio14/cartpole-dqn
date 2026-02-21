@@ -10,8 +10,6 @@ from pathlib import Path
 
 @dataclass
 class TrainingArgs:
-    learning_rate: float
-    start_epsilon: float
     episodes: int
     time_step: float
     batch_size: int
