@@ -38,7 +38,7 @@ class Trainer():
         self.frequency_rate = training_args.frequency_rate
         self.output_dir = training_args.output_dir
         self.replay_buffer_size = training_args.replay_buffer_size
-        self.rewards = []
+        self.reward_per_episode = []
 
     
     def train(self):
@@ -77,7 +77,7 @@ class Trainer():
                 self.agent.update_target_network(total_steps, self.frequency_rate)
             
             self.agent.epsilon = self.agent.decay_epsilon(episode)
-            self.rewards.append(episode_reward)
+            self.reward_per_episode.append(episode_reward)
     
     def save_model(self, name: str):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
