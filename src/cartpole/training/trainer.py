@@ -11,8 +11,9 @@ from pathlib import Path
 @dataclass
 class TrainingArgs:
     learning_rate: float
-    epsilon: float
+    start_epsilon: float
     episodes: int
+    time_step: float
     batch_size: int
     frequency_rate: int
     replay_buffer_size: int
@@ -31,9 +32,8 @@ class Trainer():
         self.environment = environment
         self.agent = agent
 
-        self.learning_rate = training_args.learning_rate
-        self.epsilon = training_args.epsilon
         self.episodes = training_args.episodes
+        self.time_step = training_args.time_step
         self.batch_size = training_args.batch_size
         self.frequency_rate = training_args.frequency_rate
         self.output_dir = training_args.output_dir
@@ -45,6 +45,7 @@ class Trainer():
 
         memory = ReplayBuffer(self.replay_buffer_size)
         total_steps = 0
+        time = 0
 
         for episode in range(self.episodes):
             state = self.environment.reset()
@@ -56,7 +57,7 @@ class Trainer():
                 action = self.agent.select_action(state)
 
                 #step takes (action,time,timestep) - What is time and timestep?
-                next_state, reward, terminated, _, _ = self.environment.step(action)
+                next_state, reward, terminated, _, _ = self.environment.step(action, time, self.time_step)
 
                 # Store transition in memory
                 memory.append(state, action, reward, next_state, terminated)
@@ -72,7 +73,7 @@ class Trainer():
                 
                 # Update target network periodically
                 total_steps =+ 1
-                time =+ step * time_step
+                time =+ total_steps * self.time_step
                 self.agent.update_target_network(total_steps, self.frequency_rate)
             
             self.agent.epsilon = self.agent.decay_epsilon(episode)

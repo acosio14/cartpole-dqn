@@ -10,11 +10,6 @@ def main():
     cart_mass_kg = 10
     pole_mass_kg = 5
     pole_len_m = 3
-
-    learning_rate = 0.001
-    start_epsilon = 1
-    discount_factor = 1
-    replay_buffer_size = 10000
     
     cartpole_env = CartPoleEnv(gravity, cart_mass_kg, pole_mass_kg, pole_len_m)
 
@@ -28,18 +23,17 @@ def main():
         cartpole_env,
         policy, 
         target, 
-        learning_rate,
-        start_epsilon,
-        discount_factor, 
+        learning_rate=0.001,
+        start_epsilon=1,
+        discount_factor=1, 
     )
 
     training_args = TrainingArgs(
-                        learning_rate=learning_rate,
-                        epsilon=start_epsilon,
-                        steps=10,
+                        episodes=10,
+                        time_step=0.1,
                         batch_size=5,
                         frequency_rate=10,
-                        replay_buffer_size=replay_buffer_size,
+                        replay_buffer_size=10000,
                         output_dir=(
                             '/Users/adriancosio/Projects/cartpole-dqn/results',
                         ),
