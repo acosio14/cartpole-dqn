@@ -13,14 +13,14 @@ class CartPoleAgent():
             policy_network: DQN,
             target_network: DQN, 
             learning_rate: float,
-            epsilon: float,
+            start_epsilon: float,
             discount_factor: float,
             replay_buffer_size: int = 10000,
         ):
         self.env = env
         self.policy_network = policy_network
         self.target_network = target_network
-        self.epsilon = epsilon
+        self.epsilon = start_epsilon
         self.discount_factor = discount_factor
         self.learning_rate = learning_rate
     

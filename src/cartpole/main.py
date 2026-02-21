@@ -12,7 +12,7 @@ def main():
     pole_len_m = 3
 
     learning_rate = 0.001
-    epsilon = 0.5
+    start_epsilon = 1
     discount_factor = 1
     replay_buffer_size = 10000
     
@@ -29,13 +29,13 @@ def main():
         policy, 
         target, 
         learning_rate,
-        epsilon,
+        start_epsilon,
         discount_factor, 
     )
 
     training_args = TrainingArgs(
                         learning_rate=learning_rate,
-                        epsilon=epsilon,
+                        epsilon=start_epsilon,
                         steps=10,
                         batch_size=5,
                         frequency_rate=10,

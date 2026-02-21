@@ -12,7 +12,7 @@ from pathlib import Path
 class TrainingArgs:
     learning_rate: float
     epsilon: float
-    steps: int
+    episodes: int
     batch_size: int
     frequency_rate: int
     replay_buffer_size: int
@@ -33,7 +33,7 @@ class Trainer():
 
         self.learning_rate = training_args.learning_rate
         self.epsilon = training_args.epsilon
-        self.steps = training_args.steps
+        self.episodes = training_args.episodes
         self.batch_size = training_args.batch_size
         self.frequency_rate = training_args.frequency_rate
         self.output_dir = training_args.output_dir
@@ -46,7 +46,7 @@ class Trainer():
         memory = ReplayBuffer(self.replay_buffer_size)
         total_steps = 0
 
-        for step in range(self.steps):
+        for episode in range(self.episodes):
             state = self.environment.reset()
             episode_reward = 0
             terminated = False
@@ -71,10 +71,11 @@ class Trainer():
                 self.agent.update_q_values(*mini_batches)
                 
                 # Update target network periodically
-                total_steps =+ step
+                total_steps =+ 1
+                time =+ step * time_step
                 self.agent.update_target_network(total_steps, self.frequency_rate)
             
-            self.agent.epsilon = self.agent.decay_epsilon(step)
+            self.agent.epsilon = self.agent.decay_epsilon(episode)
             self.rewards.append(episode_reward)
     
     def save_model(self, name: str):
