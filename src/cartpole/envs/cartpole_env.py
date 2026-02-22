@@ -12,23 +12,22 @@ class CartPoleEnv(gym.Env):
     def __init__(self, gravity: float, cart_mass: float, pole_mass: float, pole_length: float):
         
         # physical constants
-        self.gravity = gravity # m/s/s
-        self.cart_mass = cart_mass # kg
-        self.pole_mass = pole_mass
-        self.pole_length = pole_length
-
+        self.constants = [gravity, cart_mass, pole_mass, pole_length]
+        
         # initalized state variables
         self._cart_position = 0.0
         self._cart_velocity = 0.0
         self._pole_angle = 0.0
         self._pole_angular_velocity = 0.0
 
-        self.state = [
-            self._cart_position,
-            self._cart_velocity,
-            self._pole_angle,
-            self._pole_angular_velocity,
-        ]
+        self.state = np.array(
+            [
+                self._cart_position,
+                self._cart_velocity,
+                self._pole_angle,
+                self._pole_angular_velocity,
+            ]
+        )
         
         # observation and action space
         self.observation_space = spaces.Dict(
@@ -49,12 +48,14 @@ class CartPoleEnv(gym.Env):
         Returns:
             dict: Observation with cart and poles states (position, velocity, angle, angular velocity)
         """
-        return {
-            "cart_position": self._cart_position,
-            "cart_velocity": self._cart_velocity,
-            "pole_angle": self._pole_angle,
-            "pole_angular_velocity": self._pole_angular_velocity,
-        }
+        return np.array(
+            [
+                self._cart_position,
+                self._cart_velocity,
+                self._pole_angle,
+                self._pole_angular_velocity,
+            ]
+        )
     
     def reset(self, seed: int = None, options: dict = None):
         """Start a new episode.
@@ -72,42 +73,12 @@ class CartPoleEnv(gym.Env):
         self._pole_angle = self.np_random.uniform(-np.deg2rad(15), np.deg2rad(15))
 
         return self._get_obs()
-    
-    def ordinay_differantion_equations(self, state, force):
-        
-        mp = self.pole_mass
-        M = self.cart_mass
-        L = self.pole_length
-        g = self.gravity
-        
-        # Get Derivatives
-        x_dot= state[1] # cart velocity
-        x_ddot = (
-            -mp * L * np.sin(state[2]) * np.square(state[3])
-            + mp * g * np.cos(state[2]) * np.sin(state[3])
-            + force / (M + mp * np.square(np.sin(state[2]))) 
-        ) # cart acceleration
-        theta_dot = state[3] # angular velocity
-        theta_ddot = (
-            -(M + mp) * g * np.sin(state[2]) 
-            - mp * L * np.sin(state[2]) * np.cos(state[2]) * np.square(state[3]) 
-            - force * np.cos(state[2]) / (L * (M + mp * np.square(np.sin(state[2]))) ) 
-        )# angular acceleration
-
-        return [x_dot, x_ddot, theta_dot, theta_ddot]
-    
 
     def step(self, action, time, timestep):
 
-        x = [
-            self._cart_position,
-            self._cart_velocity,
-            self._pole_angle,
-            self._pole_angular_velocity,
-        ]      
-
-        xdot = self.ordinay_differantion_equations()
-        next_state = runge_kutta_fourth_order(xdot, x, action, timestep) # basically: state = state + state_dot * dt
+        next_state = (
+            runge_kutta_fourth_order(self.state, action, timestep, self.constants) # basically: state = state + state_dot * dt
+        )
 
         # reward = 1 if self._pole_angle equals 0
         if next_state[2] == 0:
@@ -117,6 +88,8 @@ class CartPoleEnv(gym.Env):
 
         if next_state[2] >= 30 or time >= 10:
             terminated = True # if pole falls (>= 30 deg), time duration (10 sec, <=30 deg)
+        else:
+            terminated = False
         
         truncated = False
         info = None
