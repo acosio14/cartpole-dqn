@@ -76,8 +76,10 @@ class CartPoleEnv(gym.Env):
 
     def step(self, action, time, timestep):
 
+
+        
         next_state = (
-            runge_kutta_fourth_order(self.state, action, timestep, self.constants) # basically: state = state + state_dot * dt
+            runge_kutta_fourth_order(self.state, self.force[action], timestep, self.constants) # basically: state = state + state_dot * dt
         )
 
         # reward = 1 if self._pole_angle equals 0
