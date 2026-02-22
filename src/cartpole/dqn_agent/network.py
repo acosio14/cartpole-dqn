@@ -10,7 +10,9 @@ class DQN(nn.Module):
         self.fc3 = nn.Linear(128,output_dim)
     
     def forward(self, states):
-        x = nn.ReLU(self.fc1(states))
-        x = nn.ReLU(self.fc2(x))
+        x = self.fc1(states)
+        x = torch.relu(x)
+        x = self.fc2(x)
+        x = torch.relu(x)
 
         return self.fc3(x)
