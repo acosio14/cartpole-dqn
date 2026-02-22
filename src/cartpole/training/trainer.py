@@ -55,10 +55,10 @@ class Trainer():
                 action = self.agent.select_action(state)
 
                 #step takes (action,time,timestep) - What is time and timestep?
-                next_state, reward, terminated, _, _ = self.environment.step(action, time, self.time_step)
+                next_state, reward, terminated, *_ = self.environment.step(action, time, self.time_step)
 
                 # Store transition in memory
-                memory.append(state, action, reward, next_state, terminated)
+                memory.append((state, action, reward, next_state, terminated))
 
                 # Update state
                 state = next_state
@@ -66,8 +66,20 @@ class Trainer():
 
                 # Optimize model
                 # state, action, reward, next_state, terminated = mini_batches
-                mini_batches = memory.sample(self.batch_size)
-                self.agent.update_q_values(*mini_batches)
+                mini_batch = memory.sample(self.batch_size)[0]
+                
+                state_batch = torch.Tensor(mini_batch[0])
+                action_batch = mini_batch[1]
+                reward_batch = mini_batch[2]
+                nstate_batch = torch.Tensor(mini_batch[3])
+                terminated_batch = mini_batch[4]
+                self.agent.update_q_values(
+                    state_batch,
+                    action_batch,
+                    reward_batch,
+                    nstate_batch,
+                    terminated_batch,
+                )
                 
                 # Update target network periodically
                 total_steps =+ 1
