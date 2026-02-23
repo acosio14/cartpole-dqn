@@ -69,4 +69,4 @@ class CartPoleAgent():
             self.target_network.load_state_dict(self.policy_network.state_dict())
 
     def decay_epsilon(self, episode):
-        self.epsilon = (1 / np.sqrt(episode + 1)) * self.epsilon
+        return (1 / np.sqrt(episode + 1)) * self.epsilon
