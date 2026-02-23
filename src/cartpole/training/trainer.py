@@ -69,14 +69,15 @@ class Trainer():
 
                 # Optimize model
                 # state, action, reward, next_state, terminated = mini_batches
-                mini_batch = memory.sample(self.batch_size)
-                mini_batch = mini_batch[0]
+                mini_batch = list(zip(*memory.sample(self.batch_size)))
+                # I was taking out the 0 index of deque not a batch of 5
+                # Basically never reorganized sample to separate buckets (state, action, etc)
 
                 state_batch = torch.tensor(mini_batch[0], dtype=torch.float32)
-                action_batch = torch.tensor(mini_batch[1]).long()
-                reward_batch = mini_batch[2]
+                action_batch = torch.tensor(mini_batch[1]).long().unsqueeze(1)
+                reward_batch = torch.tensor(mini_batch[2], dtype=torch.int32)
                 nstate_batch = torch.tensor(mini_batch[3], dtype=torch.float32)
-                terminated_batch = mini_batch[4]
+                terminated_batch = torch.tensor(mini_batch[4], dtype=torch.int32)
                 self.agent.update_q_values(
                     state_batch,
                     action_batch,
