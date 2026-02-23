@@ -55,14 +55,16 @@ class Trainer():
                 action = self.agent.select_action(state)
 
                 #step takes (action,time,timestep) - What is time and timestep?
-                next_state, reward, terminated, *_ = self.environment.step(action, time, self.time_step)
+                next_state, reward, terminated, *_ = (
+                    self.environment.step(action, time, self.time_step)
+                )
 
                 # Store transition in memory
                 memory.append((state, action, reward, next_state, terminated))
 
                 # Update state
                 state = next_state
-                episode_reward =+ reward
+                episode_reward += reward
 
                 # Optimize model
                 # state, action, reward, next_state, terminated = mini_batches
@@ -82,8 +84,8 @@ class Trainer():
                 )
                 
                 # Update target network periodically
-                total_steps =+ 1
-                time =+ total_steps * self.time_step
+                total_steps += 1
+                time = total_steps * self.time_step
                 self.agent.update_target_network(total_steps, self.frequency_rate)
             
             self.agent.epsilon = self.agent.decay_epsilon(episode)
