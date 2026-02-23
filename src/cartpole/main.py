@@ -42,7 +42,7 @@ def main():
     my_trainer = Trainer(policy, cartpole_env, cartpole_agent, training_args)
 
     my_trainer.train()
-    my_trainer.rewards
+    print(my_trainer.reward_per_episode)
 
 if __name__ == "__main__":
     main()

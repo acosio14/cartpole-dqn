@@ -43,11 +43,12 @@ class Trainer():
 
         memory = ReplayBuffer(self.replay_buffer_size)
         total_steps = 0
-        time = 0
+
 
         for episode in range(self.episodes):
             state = self.environment.reset()
             episode_reward = 0
+            time = 0
             terminated = False
 
             while not terminated:
@@ -68,7 +69,8 @@ class Trainer():
 
                 # Optimize model
                 # state, action, reward, next_state, terminated = mini_batches
-                mini_batch = memory.sample(self.batch_size)[0]
+                mini_batch = memory.sample(self.batch_size)
+                mini_batch = mini_batch[0]
 
                 state_batch = torch.tensor(mini_batch[0], dtype=torch.float32)
                 action_batch = torch.tensor(mini_batch[1]).long()
@@ -85,7 +87,7 @@ class Trainer():
                 
                 # Update target network periodically
                 total_steps += 1
-                time = total_steps * self.time_step
+                time += self.time_step
                 self.agent.update_target_network(total_steps, self.frequency_rate)
             
             self.agent.epsilon = self.agent.decay_epsilon(episode)
