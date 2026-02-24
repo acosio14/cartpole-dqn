@@ -50,7 +50,7 @@ class CartPoleAgent():
             max_q_values = self.target_network(next_state).max(1)[0] # A batch of values
             target_q_values = reward + self.discount_factor * max_q_values * (1 - terminated)
         
-        q_values =  self.policy_network(state).gather(1,action).squeeze()
+        q_values =  self.policy_network(state).gather(1,action).squeeze(1)
         print()
         print(f'target: {target_q_values}')
         print(f'q value: {q_values}')
