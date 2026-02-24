@@ -2,6 +2,7 @@ from dqn_agent.agent import CartPoleAgent
 from envs.cartpole_env import CartPoleEnv
 from dqn_agent.network import DQN
 from training.trainer import TrainingArgs, Trainer
+import matplotlib.pyplot as plt
 
 def main():
 
@@ -25,11 +26,13 @@ def main():
         target, 
         learning_rate=0.001,
         start_epsilon=1,
+        epsilon_min = 0.001,
+        epsilon_decay_rate = 0.99,
         discount_factor=1, 
     )
 
     training_args = TrainingArgs(
-                        episodes=10,
+                        episodes=100,
                         time_step=0.1,
                         batch_size=5,
                         frequency_rate=10,
@@ -43,6 +46,11 @@ def main():
 
     my_trainer.train()
     print(my_trainer.reward_per_episode)
+    plt.plot(my_trainer.reward_per_episode)
+    plt.xlabel("Episode")
+    plt.ylabel("Reward")
+    plt.title("Rewards Per Episode")
+    plt.show()
 
 if __name__ == "__main__":
     main()
