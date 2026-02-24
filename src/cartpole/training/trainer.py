@@ -36,19 +36,25 @@ class Trainer():
         self.target_update_freq = training_args.target_update_freq
         self.output_dir = training_args.output_dir
         self.replay_buffer_size = training_args.replay_buffer_size
+        
         self.reward_per_episode = []
+        self.epsilon_per_episode = []
+        self.loss_per_episode = []
+        self.steps_per_episode = []
 
     
     def train(self):
 
         memory = ReplayBuffer(self.replay_buffer_size)
-        total_steps = 0
 
 
         for episode in range(self.episodes):
             state = self.environment.reset()
             episode_reward = 0
+            steps_per_episode = 0
+            total_loss = 0
             time = 0
+            total_steps = 0
             terminated = False
 
             while not terminated:
@@ -78,7 +84,7 @@ class Trainer():
                 reward_batch = torch.tensor(mini_batch[2], dtype=torch.int32)
                 nstate_batch = torch.tensor(mini_batch[3], dtype=torch.float32)
                 terminated_batch = torch.tensor(mini_batch[4], dtype=torch.int32)
-                self.agent.update_q_values(
+                loss = self.agent.update_q_values(
                     state_batch,
                     action_batch,
                     reward_batch,
@@ -86,13 +92,21 @@ class Trainer():
                     terminated_batch,
                 )
                 
+                total_loss += loss.item()
+                steps_per_episode += 1
                 # Update target network periodically
                 total_steps += 1
                 time += self.time_step
                 self.agent.update_target_network(total_steps, self.target_update_freq)
+
             
             self.agent.epsilon = self.agent.decay_epsilon()
+            
+            self.steps_per_episode.append(steps_per_episode)
+            self.loss_per_episode.append(total_loss/steps_per_episode)
             self.reward_per_episode.append(episode_reward)
+            self.epsilon_per_episode.append(self.agent.epsilon)
+
     
     def save_model(self, name: str):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
