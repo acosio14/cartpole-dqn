@@ -2,6 +2,7 @@ from dqn_agent.agent import CartPoleAgent
 from envs.cartpole_env import CartPoleEnv
 from dqn_agent.network import DQN
 from training.trainer import TrainingArgs, Trainer
+from utils.visualization import RLPlots as plots
 import matplotlib.pyplot as plt
 
 def main():
@@ -34,8 +35,8 @@ def main():
     training_args = TrainingArgs(
                         episodes=100,
                         time_step=0.1,
-                        batch_size=5,
-                        target_update_freq=10,
+                        batch_size=32,
+                        target_update_freq=50,
                         replay_buffer_size=10000,
                         output_dir=(
                             '/Users/adriancosio/Projects/cartpole-dqn/results',
@@ -45,12 +46,25 @@ def main():
     my_trainer = Trainer(policy, cartpole_env, cartpole_agent, training_args)
 
     my_trainer.train()
-    print(my_trainer.reward_per_episode)
-    plt.plot(my_trainer.reward_per_episode)
-    plt.xlabel("Episode")
-    plt.ylabel("Reward")
-    plt.title("Rewards Per Episode")
+
+    cartpole_plots = plots(
+        my_trainer.reward_per_episode,
+        my_trainer.steps_per_episode,
+        my_trainer.loss_per_episode,
+        my_trainer.epsilon_per_episode
+    )
+
+    plt.figure(1)
+    cartpole_plots.plot_learning_curve()
+    plt.figure(2)
+    cartpole_plots.plot_mse_loss()
+    plt.figure(3)
+    cartpole_plots.plot_epsilon()
+    plt.figure(4)
+    cartpole_plots.plot_steps_per_episode()
+    
     plt.show()
+
 
 if __name__ == "__main__":
     main()
