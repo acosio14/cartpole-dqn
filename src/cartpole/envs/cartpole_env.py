@@ -88,7 +88,9 @@ class CartPoleEnv(gym.Env):
         else:
             reward = -0.01
 
-        if next_state[2] >= 30 or time >= 10:
+        print(next_state[2])
+        print(np.deg2rad(30)) #Never hits terminal angle 30 deg (0.5235 rad)
+        if np.abs(next_state[2]) >= np.deg2rad(30) or time >= 10:
             terminated = True # if pole falls (>= 30 deg), time duration (10 sec, <=30 deg)
         else:
             terminated = False
