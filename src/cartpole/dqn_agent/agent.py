@@ -14,12 +14,16 @@ class CartPoleAgent():
             target_network: DQN, 
             learning_rate: float,
             start_epsilon: float,
+            epsilon_min: float,
+            epsilon_decay_rate: float,
             discount_factor: float,
         ):
         self.env = env
         self.policy_network = policy_network
         self.target_network = target_network
         self.epsilon = start_epsilon
+        self.epsilon_min = epsilon_min
+        self.decay_rate = epsilon_decay_rate
         self.discount_factor = discount_factor
         self.learning_rate = learning_rate
     
@@ -51,9 +55,9 @@ class CartPoleAgent():
             target_q_values = reward + self.discount_factor * max_q_values * (1 - terminated)
         
         q_values =  self.policy_network(state).gather(1,action).squeeze(1)
-        print()
-        print(f'target: {target_q_values}')
-        print(f'q value: {q_values}')
+        # print()
+        # print(f'target: {target_q_values}')
+        # print(f'q value: {q_values}')
 
         loss = F.mse_loss(q_values, target_q_values)
         loss.backward()
@@ -69,5 +73,5 @@ class CartPoleAgent():
         if steps % update_frequency == 0:
             self.target_network.load_state_dict(self.policy_network.state_dict())
 
-    def decay_epsilon(self, episode):
-        return (1 / np.sqrt(episode + 1)) * self.epsilon
+    def decay_epsilon(self):
+        return max(self.decay_rate * self.epsilon, self.epsilon_min)
