@@ -6,6 +6,7 @@ import torch
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+import numpy as np
 
 
 @dataclass
@@ -31,7 +32,7 @@ class Trainer():
         self.agent = agent
 
         self.episodes = training_args.episodes
-        self.time_step = training_args.time_step
+        self.time_step = np.array([training_args.time_step])
         self.batch_size = training_args.batch_size
         self.target_update_freq = training_args.target_update_freq
         self.output_dir = training_args.output_dir
