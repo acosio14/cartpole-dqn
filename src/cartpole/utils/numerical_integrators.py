@@ -9,8 +9,8 @@ def euler(x, x_dot, timestep):
 # Can't import df as ode because its a method of cartpoleenv
 def runge_kutta_fourth_order(state, force, timestep, constants):
     k1 = df(state, force, constants)
-    k2 = df(state + k1/2, force, constants)
-    k3 = df(state + k2/2, force, constants)
-    k4 = df(state + k3, force, constants)
+    k2 = df(state + timestep * k1/2, force, constants)
+    k3 = df(state + timestep * k2/2, force, constants)
+    k4 = df(state + timestep * k3, force, constants)
 
-    return state + (1/6)*timestep*(k1 + 2*k2 + 2*k3 + k4) # state_1 (n+1)
+    return state + timestep * (k1 + 2*k2 + 2*k3 + k4)/6 # state_1 (n+1)
