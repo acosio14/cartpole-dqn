@@ -66,6 +66,8 @@ class CartPoleAgent():
             lr=self.learning_rate,
         ).step()
 
+        return loss
+
 
     def update_target_network(self, steps, update_frequency):
         # should copy policy network weights to target_network
