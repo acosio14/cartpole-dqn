@@ -48,7 +48,6 @@ class Trainer():
 
         memory = ReplayBuffer(self.replay_buffer_size)
 
-
         for episode in range(self.episodes):
             state = self.environment.reset()
             episode_reward = 0
@@ -75,34 +74,33 @@ class Trainer():
                 episode_reward += reward
 
                 # Optimize model
-                # state, action, reward, next_state, terminated = mini_batches
-                mini_batch = list(zip(*memory.sample(self.batch_size)))
-                # I was taking out the 0 index of deque not a batch of 5
-                # Basically never reorganized sample to separate buckets (state, action, etc)
+                if len(memory) > self.batch_size:
 
-                state_batch = torch.tensor(mini_batch[0], dtype=torch.float32)
-                action_batch = torch.tensor(mini_batch[1]).long().unsqueeze(1)
-                reward_batch = torch.tensor(mini_batch[2], dtype=torch.int32)
-                nstate_batch = torch.tensor(mini_batch[3], dtype=torch.float32)
-                terminated_batch = torch.tensor(mini_batch[4], dtype=torch.int32)
-                loss = self.agent.update_q_values(
-                    state_batch,
-                    action_batch,
-                    reward_batch,
-                    nstate_batch,
-                    terminated_batch,
-                )
+                    mini_batch = list(zip(*memory.sample(self.batch_size)))
+                    # I was taking out the 0 index of deque not a batch of 5
+                    # Basically never reorganized sample to separate buckets (state, action, etc)
+
+                    state_batch = torch.tensor(mini_batch[0], dtype=torch.float32)
+                    action_batch = torch.tensor(mini_batch[1]).long().unsqueeze(1)
+                    reward_batch = torch.tensor(mini_batch[2], dtype=torch.float32)
+                    nstate_batch = torch.tensor(mini_batch[3], dtype=torch.float32)
+                    terminated_batch = torch.tensor(mini_batch[4], dtype=torch.float32)
+                    loss = self.agent.update_q_values(
+                        state_batch,
+                        action_batch,
+                        reward_batch,
+                        nstate_batch,
+                        terminated_batch,
+                    )
                 
-                total_loss += loss.item()
+                    total_loss += loss.item()
                 steps_per_episode += 1
                 # Update target network periodically
                 total_steps += 1
                 time += self.time_step
                 self.agent.update_target_network(total_steps, self.target_update_freq)
+                self.agent.epsilon = self.agent.decay_epsilon()
 
-            
-            self.agent.epsilon = self.agent.decay_epsilon()
-            
             self.steps_per_episode.append(steps_per_episode)
             self.loss_per_episode.append(total_loss/steps_per_episode)
             self.reward_per_episode.append(episode_reward)
