@@ -25,17 +25,17 @@ def main():
         cartpole_env,
         policy, 
         target, 
-        learning_rate=0.001,
+        learning_rate=0.0001,
         start_epsilon=1,
-        epsilon_min = 0.001,
-        epsilon_decay_rate = 0.995,
+        epsilon_min = 0.05,
+        epsilon_decay_rate = 0.9999,
         discount_factor=0.99, 
     )
 
     training_args = TrainingArgs(
-                        episodes=100,
+                        episodes=1000,
                         time_step=0.1,
-                        batch_size=32,
+                        batch_size=64,
                         target_update_freq=50,
                         replay_buffer_size=10000,
                         output_dir=(
