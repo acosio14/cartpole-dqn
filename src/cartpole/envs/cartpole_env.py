@@ -80,14 +80,11 @@ class CartPoleEnv(gym.Env):
             runge_kutta_fourth_order(state, self.force[action], timestep, self.constants) # basically: state = state + state_dot * dt
         )
 
-        # reward = 1 if self._pole_angle equals 0
         pole_angle = abs(next_state[2])
-        if pole_angle == 0:
+        if pole_angle <= np.deg2rad(30):
             reward = 1.0
-        elif pole_angle <= np.deg2rad(2):
-            reward = 0.2
         else:
-            reward = -0.01
+            reward = 0
 
         print(f'angle: {next_state[2]}')
         print(np.deg2rad(30)) #Never hits terminal angle 30 deg (0.5235 rad)
