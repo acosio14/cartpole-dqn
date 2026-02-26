@@ -64,7 +64,7 @@ class Trainer():
 
                 #step takes (action,time,timestep) - What is time and timestep?
                 next_state, reward, terminated, *_ = (
-                    self.environment.step(action, time, self.time_step)
+                    self.environment.step(state, action, time, self.time_step)
                 )
 
                 # Store transition in memory

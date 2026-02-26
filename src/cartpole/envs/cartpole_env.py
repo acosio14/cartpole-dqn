@@ -17,7 +17,7 @@ class CartPoleEnv(gym.Env):
         # initalized state variables
         self._cart_position = 0.0
         self._cart_velocity = 0.0
-        self._pole_angle = 0.0
+        self._pole_angle = 0.1
         self._pole_angular_velocity = 0.0
 
         self.state = np.array(
@@ -74,23 +74,25 @@ class CartPoleEnv(gym.Env):
 
         return self._get_obs()
 
-    def step(self, action, time, timestep):
+    def step(self, state, action, time, timestep):
 
-
-        
-        next_state = (
-            runge_kutta_fourth_order(self.state, self.force[action], timestep, self.constants) # basically: state = state + state_dot * dt
+        next_state= (
+            runge_kutta_fourth_order(state, self.force[action], timestep, self.constants) # basically: state = state + state_dot * dt
         )
 
         # reward = 1 if self._pole_angle equals 0
-        if next_state[2] == 0:
+        pole_angle = abs(next_state[2])
+        if pole_angle == 0:
             reward = 1.0
+        elif pole_angle <= np.deg2rad(2):
+            reward = 0.2
         else:
             reward = -0.01
 
-        print(next_state[2])
+        print(f'angle: {next_state[2]}')
         print(np.deg2rad(30)) #Never hits terminal angle 30 deg (0.5235 rad)
-        if np.abs(next_state[2]) >= np.deg2rad(30) or time >= 10:
+
+        if pole_angle >= np.deg2rad(30) or time >= 10:
             terminated = True # if pole falls (>= 30 deg), time duration (10 sec, <=30 deg)
         else:
             terminated = False
