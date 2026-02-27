@@ -27,16 +27,16 @@ def main():
         target, 
         learning_rate=0.0001,
         start_epsilon=1,
-        epsilon_min = 0.05,
+        epsilon_min = 0.01,
         epsilon_decay_rate = 0.9999,
         discount_factor=0.99, 
     )
 
     training_args = TrainingArgs(
-                        episodes=1000,
+                        episodes=1500,
                         time_step=0.1,
                         batch_size=64,
-                        target_update_freq=50,
+                        target_update_freq=500,
                         replay_buffer_size=10000,
                         output_dir=(
                             '/Users/adriancosio/Projects/cartpole-dqn/results',
