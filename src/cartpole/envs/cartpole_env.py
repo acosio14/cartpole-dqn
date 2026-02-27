@@ -39,8 +39,8 @@ class CartPoleEnv(gym.Env):
                 "pole_angular_velocity": spaces.Box(-np.inf, np.inf, shape=(1,), dtype=np.float32),
             }
         )
-        self.action_space = spaces.Discrete(5) # Discrete(5) -> [0,1,2,3,4]
-        self.force = [-10, -5, 0, 5, 10]
+        self.action_space = spaces.Discrete(2) # Discrete(5) -> [0,1,2,3,4]
+        self.force = [-10, 10]
 
     def _get_obs(self):
         """Convert internal state to observation format.
@@ -81,15 +81,17 @@ class CartPoleEnv(gym.Env):
         )
 
         pole_angle = abs(next_state[2])
-        if pole_angle <= np.deg2rad(30):
+        if pole_angle <= np.deg2rad(10):
             reward = 1.0
+        elif pole_angle >= np.deg2rad(10) and pole_angle <= np.deg2rad(30):
+            reward = 0.5
         else:
             reward = 0
 
         print(f'angle: {next_state[2]}')
         print(np.deg2rad(30)) #Never hits terminal angle 30 deg (0.5235 rad)
 
-        if pole_angle >= np.deg2rad(30) or time >= 10:
+        if pole_angle >= np.deg2rad(30) or time >= 20:
             terminated = True # if pole falls (>= 30 deg), time duration (10 sec, <=30 deg)
         else:
             terminated = False
