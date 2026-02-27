@@ -39,8 +39,8 @@ class CartPoleEnv(gym.Env):
                 "pole_angular_velocity": spaces.Box(-np.inf, np.inf, shape=(1,), dtype=np.float32),
             }
         )
-        self.action_space = spaces.Discrete(2) # Discrete(5) -> [0,1,2,3,4]
-        self.force = [-10, 10]
+        self.action_space = spaces.Discrete(4) # Discrete(5) -> [0,1,2,3,4]
+        self.force = [-10, -2, 2, 10]
 
     def _get_obs(self):
         """Convert internal state to observation format.
