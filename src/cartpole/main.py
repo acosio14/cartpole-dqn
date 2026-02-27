@@ -28,13 +28,13 @@ def main():
         learning_rate=0.0001,
         start_epsilon=1,
         epsilon_min = 0.01,
-        epsilon_decay_rate = 0.99995,
+        epsilon_decay_rate = 0.9999,
         discount_factor=0.99, 
     )
 
     training_args = TrainingArgs(
                         episodes=1500,
-                        time_step=0.1,
+                        time_step=0.05,
                         batch_size=64,
                         target_update_freq=500,
                         replay_buffer_size=10000,
@@ -53,20 +53,14 @@ def main():
         my_trainer.loss_per_episode,
         my_trainer.epsilon_per_episode
     )
-
+    
     plt.figure(1)
-    cartpole_plots.plot_learning_curve()
-    plt.figure(2)
-    cartpole_plots.plot_mse_loss()
-    plt.figure(3)
     cartpole_plots.plot_epsilon()
-    plt.figure(4)
-    cartpole_plots.plot_steps_per_episode()
-    plt.figure(5)
+    plt.figure(2)
     cartpole_plots.plot_learning_curve_moving_avg(window_size=50)
-    plt.figure(6)
+    plt.figure(3)
     cartpole_plots.plot_loss_moving_avg(window_size=50)
-    plt.figure(7)
+    plt.figure(4)
     cartpole_plots.plot_step_moving_avg(window_size=50)
     
     plt.show()
