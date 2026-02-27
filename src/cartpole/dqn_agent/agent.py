@@ -26,6 +26,11 @@ class CartPoleAgent():
         self.decay_rate = epsilon_decay_rate
         self.discount_factor = discount_factor
         self.learning_rate = learning_rate
+
+        self.optimizer = torch.optim.Adam(
+            params=self.policy_network.parameters(), 
+            lr=self.learning_rate,
+        )
     
     def select_action(self, state):
         """ Selection action based on epsilon and Q values."""
@@ -60,11 +65,9 @@ class CartPoleAgent():
         # print(f'q value: {q_values}')
 
         loss = F.mse_loss(q_values, target_q_values)
+        self.optimizer.zero_grad()
         loss.backward()
-        torch.optim.Adam(
-            params=self.policy_network.parameters(), 
-            lr=self.learning_rate,
-        ).step()
+        self.optimizer.step()
 
         return loss
 
