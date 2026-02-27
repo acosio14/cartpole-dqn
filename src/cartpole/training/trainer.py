@@ -47,6 +47,7 @@ class Trainer():
     def train(self):
 
         memory = ReplayBuffer(self.replay_buffer_size)
+        total_steps = 0
 
         for episode in range(self.episodes):
             state = self.environment.reset()
@@ -54,7 +55,7 @@ class Trainer():
             steps_per_episode = 0
             total_loss = 0
             time = 0
-            total_steps = 0
+
             terminated = False
 
             while not terminated:
@@ -74,7 +75,7 @@ class Trainer():
                 episode_reward += reward
 
                 # Optimize model
-                if len(memory) > self.batch_size:
+                if len(memory) > 1000:
 
                     mini_batch = list(zip(*memory.sample(self.batch_size)))
                     # I was taking out the 0 index of deque not a batch of 5
