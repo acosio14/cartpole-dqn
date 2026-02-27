@@ -28,7 +28,7 @@ def main():
         learning_rate=0.0001,
         start_epsilon=1,
         epsilon_min = 0.01,
-        epsilon_decay_rate = 0.9999,
+        epsilon_decay_rate = 0.99995,
         discount_factor=0.99, 
     )
 
@@ -62,6 +62,12 @@ def main():
     cartpole_plots.plot_epsilon()
     plt.figure(4)
     cartpole_plots.plot_steps_per_episode()
+    plt.figure(5)
+    cartpole_plots.plot_learning_curve_moving_avg(window_size=50)
+    plt.figure(6)
+    cartpole_plots.plot_loss_moving_avg(window_size=50)
+    plt.figure(7)
+    cartpole_plots.plot_step_moving_avg(window_size=50)
     
     plt.show()
 
