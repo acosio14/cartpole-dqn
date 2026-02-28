@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 import numpy as np
+from tqdm import tqdm
 
 
 @dataclass
@@ -49,7 +50,7 @@ class Trainer():
         memory = ReplayBuffer(self.replay_buffer_size)
         total_steps = 0
 
-        for episode in range(self.episodes):
+        for episode in tqdm(range(self.episodes),ncols=100,desc="Episodes"):
             state = self.environment.reset()
             episode_reward = 0
             steps_per_episode = 0
@@ -79,12 +80,11 @@ class Trainer():
 
                     mini_batch = list(zip(*memory.sample(self.batch_size)))
                     # I was taking out the 0 index of deque not a batch of 5
-                    # Basically never reorganized sample to separate buckets (state, action, etc)
-
-                    state_batch = torch.tensor(mini_batch[0], dtype=torch.float32)
+                    # Basically never reorganized sample to separate buckets (state, action, etc) 
+                    state_batch = torch.tensor(np.array(mini_batch[0]), dtype=torch.float32)
                     action_batch = torch.tensor(mini_batch[1]).long().unsqueeze(1)
                     reward_batch = torch.tensor(mini_batch[2], dtype=torch.float32)
-                    nstate_batch = torch.tensor(mini_batch[3], dtype=torch.float32)
+                    nstate_batch = torch.tensor(np.array(mini_batch[3]), dtype=torch.float32)
                     terminated_batch = torch.tensor(mini_batch[4], dtype=torch.float32)
                     loss = self.agent.update_q_values(
                         state_batch,
