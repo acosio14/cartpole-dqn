@@ -4,6 +4,7 @@ from dqn_agent.network import DQN
 from training.trainer import TrainingArgs, Trainer
 from utils.visualization import RLPlots as plots
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 def main():
 
@@ -33,7 +34,7 @@ def main():
     )
 
     training_args = TrainingArgs(
-                        episodes=1500,
+                        episodes=100,
                         time_step=0.05,
                         batch_size=64,
                         target_update_freq=500,
@@ -53,17 +54,23 @@ def main():
         my_trainer.loss_per_episode,
         my_trainer.epsilon_per_episode
     )
+
+    # make this into a plot arg with option: reward, loss, epsilon, step (default: reward)
+    # plt.figure(1)
+    # cartpole_plots.plot_epsilon()
+    # plt.figure(2)
+    # cartpole_plots.plot_learning_curve_moving_avg(window_size=50)
+    # plt.figure(3)
+    # cartpole_plots.plot_loss_moving_avg(window_size=50)
+    # plt.figure(4)
+    # cartpole_plots.plot_step_moving_avg(window_size=50)
     
-    plt.figure(1)
-    cartpole_plots.plot_epsilon()
-    plt.figure(2)
-    cartpole_plots.plot_learning_curve_moving_avg(window_size=50)
-    plt.figure(3)
-    cartpole_plots.plot_loss_moving_avg(window_size=50)
-    plt.figure(4)
-    cartpole_plots.plot_step_moving_avg(window_size=50)
+    # plt.show()
     
-    plt.show()
+
+    # make this into arg option also, with name as option
+    cartpole_dqn_root = Path(__file__).parent.parent.parent
+    my_trainer.save_model(cartpole_dqn_root, 'cartpole_rk4')
 
 
 if __name__ == "__main__":

@@ -108,12 +108,14 @@ class Trainer():
             self.epsilon_per_episode.append(self.agent.epsilon)
 
     
-    def save_model(self, name: str):
+    def save_model(self, dir_path: str, name: str):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        dir_path = Path('')
+        full_path = dir_path / 'results'
         filename = f'{name}_{timestamp}.pt'
 
         torch.save(
             self.model.state_dict(),
-            dir_path / filename
+            full_path / filename
         )
+
+        print(f'Model Saved: "{filename}"')
