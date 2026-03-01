@@ -5,16 +5,21 @@ from training.trainer import TrainingArgs, Trainer
 from utils.visualization import RLPlots as plots
 import matplotlib.pyplot as plt
 from pathlib import Path
+import yaml
 
 def main():
 
-    #Cart Variables
-    gravity = 9.8
-    cart_mass_kg = 10
-    pole_mass_kg = 5
-    pole_len_m = 3
-    
-    cartpole_env = CartPoleEnv(gravity, cart_mass_kg, pole_mass_kg, pole_len_m)
+    config_file = 'config_01.yml'
+    config_path = Path(__file__).parent.parent.parent / 'config' / config_file
+    with open(config_path, 'r') as file:
+        config = yaml.safe_load(file)
+        
+    cartpole_env = CartPoleEnv(
+        config['gravity'],
+        config['cart_mass_kg'],
+        config['pole_mass_kg'],
+        config['pole_len_m'],
+    )
 
     network_input_dim = len(cartpole_env.observation_space.spaces) # Discrete has no len()
     network_output_dim = cartpole_env.action_space.n
@@ -26,22 +31,20 @@ def main():
         cartpole_env,
         policy, 
         target, 
-        learning_rate=0.0001,
-        start_epsilon=1,
-        epsilon_min = 0.01,
-        epsilon_decay_rate = 0.9999,
-        discount_factor=0.99, 
+        learning_rate=config['learning_rate'],
+        start_epsilon=config['start_epsilon'],
+        epsilon_min = config['epsilon_min'],
+        epsilon_decay_rate = config['epsilon_decay_rate'],
+        discount_factor=config['discount_factor'], 
     )
 
     training_args = TrainingArgs(
-                        episodes=100,
-                        time_step=0.05,
-                        batch_size=64,
-                        target_update_freq=500,
-                        replay_buffer_size=10000,
-                        output_dir=(
-                            '/Users/adriancosio/Projects/cartpole-dqn/results',
-                        ),
+                        episodes=config['epsiodes'],
+                        time_step=config['time_step'],
+                        batch_size=config['batch_size'],
+                        target_update_freq=config['target_update_freq'],
+                        replay_buffer_size=config['replay_buffer_size'],
+                        output_dir=config['output_dir'],
                     )
     
     my_trainer = Trainer(policy, cartpole_env, cartpole_agent, training_args)
