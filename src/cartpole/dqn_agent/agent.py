@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from torch.optim import Optimizer
 import gymnasium as gym
 from dqn_agent.network import DQN
 from utils.replay_buffer import ReplayBuffer
@@ -11,7 +12,8 @@ class CartPoleAgent():
             self,
             env: gym.Env,
             policy_network: DQN,
-            target_network: DQN, 
+            target_network: DQN,
+            optimizer: Optimizer,
             learning_rate: float,
             start_epsilon: float,
             epsilon_min: float,
@@ -27,7 +29,7 @@ class CartPoleAgent():
         self.discount_factor = discount_factor
         self.learning_rate = learning_rate
 
-        self.optimizer = torch.optim.Adam(
+        self.optimizer = optimizer(
             params=self.policy_network.parameters(), 
             lr=self.learning_rate,
         )

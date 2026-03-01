@@ -6,6 +6,7 @@ from utils.visualization import RLPlots as plots
 import matplotlib.pyplot as plt
 from pathlib import Path
 import yaml
+import torch
 
 def main():
 
@@ -30,21 +31,22 @@ def main():
     cartpole_agent = CartPoleAgent(
         cartpole_env,
         policy, 
-        target, 
-        learning_rate=config['learning_rate'],
-        start_epsilon=config['start_epsilon'],
+        target,
+        optimizer = torch.optim.Adam,
+        learning_rate = config['learning_rate'],
+        start_epsilon = config['start_epsilon'],
         epsilon_min = config['epsilon_min'],
         epsilon_decay_rate = config['epsilon_decay_rate'],
-        discount_factor=config['discount_factor'], 
+        discount_factor = config['discount_factor'], 
     )
 
     training_args = TrainingArgs(
-                        episodes=config['epsiodes'],
-                        time_step=config['time_step'],
-                        batch_size=config['batch_size'],
-                        target_update_freq=config['target_update_freq'],
-                        replay_buffer_size=config['replay_buffer_size'],
-                        output_dir=config['output_dir'],
+                        episodes = config['episodes'],
+                        time_step = config['time_step'],
+                        batch_size = config['batch_size'],
+                        target_update_freq = config['target_update_freq'],
+                        replay_buffer_size = config['replay_buffer_size'],
+                        output_dir = config['output_dir'],
                     )
     
     my_trainer = Trainer(policy, cartpole_env, cartpole_agent, training_args)
