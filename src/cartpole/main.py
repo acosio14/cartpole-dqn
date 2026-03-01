@@ -46,7 +46,6 @@ def main():
                         batch_size = config['batch_size'],
                         target_update_freq = config['target_update_freq'],
                         replay_buffer_size = config['replay_buffer_size'],
-                        output_dir = config['output_dir'],
                     )
     
     my_trainer = Trainer(policy, cartpole_env, cartpole_agent, training_args)
@@ -74,8 +73,13 @@ def main():
     
 
     # make this into arg option also, with name as option
-    cartpole_dqn_root = Path(__file__).parent.parent.parent
-    my_trainer.save_model(cartpole_dqn_root, 'cartpole_rk4')
+    default_output = True
+    if default_output:
+        results_dir = Path(__file__).parent.parent.parent / 'results'
+    else:
+        results_dir = config['output_dir']
+
+    my_trainer.save_model(results_dir, 'cartpole_rk4')
 
 
 if __name__ == "__main__":

@@ -17,7 +17,6 @@ class TrainingArgs:
     batch_size: int
     target_update_freq: int
     replay_buffer_size: int
-    output_dir: str
 
 
 class Trainer():
@@ -36,7 +35,6 @@ class Trainer():
         self.time_step = np.array([training_args.time_step])
         self.batch_size = training_args.batch_size
         self.target_update_freq = training_args.target_update_freq
-        self.output_dir = training_args.output_dir
         self.replay_buffer_size = training_args.replay_buffer_size
         
         self.reward_per_episode = []
@@ -108,9 +106,8 @@ class Trainer():
             self.epsilon_per_episode.append(self.agent.epsilon)
 
     
-    def save_model(self, dir_path: str, name: str):
+    def save_model(self, full_path: str, name: str):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        full_path = dir_path / 'results'
         filename = f'{name}_{timestamp}.pt'
 
         torch.save(
@@ -118,4 +115,4 @@ class Trainer():
             full_path / filename
         )
 
-        print(f'Model Saved: "{filename}"')
+        print(f'Model Saved: "{filename}"') 
