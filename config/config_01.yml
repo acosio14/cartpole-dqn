@@ -5,6 +5,7 @@ pole_mass_kg: 5
 pole_len_m: 3
 
 # Agent
+optimizer: torch.optim.Adam
 learning_rate: 0.0001
 start_epsilon: 1
 epsilon_min: 0.01
