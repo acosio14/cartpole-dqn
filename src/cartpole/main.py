@@ -7,8 +7,19 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import yaml
 import torch
+import argparse
 
 def main():
+    parser = argparse.ArgumentParser(description="Non-Linear Cart Pole RL Problem.")
+    parser.add_argument("--train", help="Train Cart Pole model.")
+    parser.add_argument("--plot", help="Plot RL figures.")
+    parser.add_argument("--save", help="Save Cart Pole Model.")
+    parser.add_argument("--animation", help="Show animation of Cart Pole.")
+    parser.add_argument("--load", help="Load a model.")
+    parser.add_argument("--run", help="Run inferance model.")
+
+    args = parser.parse_args()
+
 
     config_file = 'config_01.yml'
     config_path = Path(__file__).parent.parent.parent / 'config' / config_file
