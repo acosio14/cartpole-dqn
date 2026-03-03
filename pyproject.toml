@@ -1,0 +1,12 @@
+[project]
+name = "cartpole"
+version = "0.0.1"
+description = "My Non-Linear Cartpole RL Project"
+dependencies = []
+
+[project.scripts]
+cartpole = "cartpole.main:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
