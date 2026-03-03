@@ -12,9 +12,8 @@ epsilon_decay_rate: 0.9999
 discount_factor: 0.99
 
 #Training_Args:
-episodes: 1500
+episodes: 150
 time_step: 0.05
 batch_size: 64
 target_update_freq: 500
 replay_buffer_size: 10000
-output_dir: '/Users/adriancosio/Projects/cartpole-dqn/results'
