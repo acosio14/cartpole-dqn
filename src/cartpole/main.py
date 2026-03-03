@@ -12,9 +12,9 @@ import argparse
 def main():
     parser = argparse.ArgumentParser(description="Non-Linear Cart Pole RL Problem.")
     parser.add_argument("--train", help="Train Cart Pole model.")
-    parser.add_argument("--plot", nargs='+', help="Plot RL figures.")
+    parser.add_argument("--plot", action="store_true", help="Plot RL figures.")
     parser.add_argument("--output_dir", type=str, help="Directory to save trained models.")
-    parser.add_argument("--animation", help="Show animation of Cart Pole.")
+    parser.add_argument("--animation", action="store_true", help="Show animation of Cart Pole.")
     parser.add_argument("--load", help="Load a model.")
     parser.add_argument("--run", help="Run inferance model.")
 
@@ -68,27 +68,27 @@ def main():
             results_dir = Path(args.output_dir)
             my_trainer.save_model(results_dir.resolve(), 'cartpole_rk4')
     
-    if args.plot:
 
-        cartpole_plots = plots(
-            my_trainer.reward_per_episode,
-            my_trainer.steps_per_episode,
-            my_trainer.loss_per_episode,
-            my_trainer.epsilon_per_episode
-        )
+        if args.plot:
 
-        # make this into a plot arg with option: reward, loss, epsilon, step (default: reward)
-        # plt.figure(1)
-        # cartpole_plots.plot_epsilon()
-        # plt.figure(2)
-        # cartpole_plots.plot_learning_curve_moving_avg(window_size=50)
-        # plt.figure(3)
-        # cartpole_plots.plot_loss_moving_avg(window_size=50)
-        # plt.figure(4)
-        # cartpole_plots.plot_step_moving_avg(window_size=50)
-        
-        # plt.show()
+            cartpole_plots = plots(
+                my_trainer.reward_per_episode,
+                my_trainer.steps_per_episode,
+                my_trainer.loss_per_episode,
+                my_trainer.epsilon_per_episode
+            )
 
-
+            # make this into a plot arg with option: reward, loss, epsilon, step (default: reward)
+            plt.figure(1)
+            cartpole_plots.plot_epsilon()
+            plt.figure(2)
+            cartpole_plots.plot_learning_curve_moving_avg(window_size=50)
+            plt.figure(3)
+            cartpole_plots.plot_loss_moving_avg(window_size=50)
+            plt.figure(4)
+            cartpole_plots.plot_step_moving_avg(window_size=50)
+            
+            plt.show()
+    
 if __name__ == "__main__":
     main()
