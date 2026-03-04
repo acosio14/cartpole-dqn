@@ -43,8 +43,6 @@ def main():
             cartpole_env,
             policy, 
             target,
-            optimizer = torch.optim.Adam,
-            learning_rate = config['learning_rate'],
             start_epsilon = config['start_epsilon'],
             epsilon_min = config['epsilon_min'],
             epsilon_decay_rate = config['epsilon_decay_rate'],
@@ -57,6 +55,8 @@ def main():
                             batch_size = config['batch_size'],
                             target_update_freq = config['target_update_freq'],
                             replay_buffer_size = config['replay_buffer_size'],
+                            optimizer = torch.optim.Adam,
+                            learning_rate = config['learning_rate'],
                         )
         
         my_trainer = Trainer(policy, cartpole_env, cartpole_agent, training_args)

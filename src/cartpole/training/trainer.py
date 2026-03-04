@@ -8,7 +8,8 @@ from datetime import datetime
 from pathlib import Path
 import numpy as np
 from tqdm import tqdm
-
+from torch.nn import functional as F
+from torch.optim import Optimizer
 
 @dataclass
 class TrainingArgs:
@@ -17,7 +18,8 @@ class TrainingArgs:
     batch_size: int
     target_update_freq: int
     replay_buffer_size: int
-
+    optimizer: Optimizer
+    learning_rate: float
 
 class Trainer():
     def __init__(
@@ -36,7 +38,11 @@ class Trainer():
         self.batch_size = training_args.batch_size
         self.target_update_freq = training_args.target_update_freq
         self.replay_buffer_size = training_args.replay_buffer_size
-        
+        self.learning_rate = training_args.learning_rate
+        self.optimizer = training_args.optimizer(
+            params=self.agent.policy_network.parameters(), 
+            lr=self.learning_rate,
+        )
         self.reward_per_episode = []
         self.epsilon_per_episode = []
         self.loss_per_episode = []
@@ -76,21 +82,14 @@ class Trainer():
                 # Optimize model
                 if len(memory) > 1000:
 
-                    mini_batch = list(zip(*memory.sample(self.batch_size)))
-                    # I was taking out the 0 index of deque not a batch of 5
-                    # Basically never reorganized sample to separate buckets (state, action, etc) 
-                    state_batch = torch.tensor(np.array(mini_batch[0]), dtype=torch.float32)
-                    action_batch = torch.tensor(mini_batch[1]).long().unsqueeze(1)
-                    reward_batch = torch.tensor(mini_batch[2], dtype=torch.float32)
-                    nstate_batch = torch.tensor(np.array(mini_batch[3]), dtype=torch.float32)
-                    terminated_batch = torch.tensor(mini_batch[4], dtype=torch.float32)
-                    loss = self.agent.update_q_values(
-                        state_batch,
-                        action_batch,
-                        reward_batch,
-                        nstate_batch,
-                        terminated_batch,
-                    )
+                    batch = list(zip(*memory.sample(self.batch_size)))
+
+                    q_values, target_q_values = self.agent.update_q_values(batch)
+
+                    loss = F.mse_loss(q_values, target_q_values)
+                    self.optimizer.zero_grad()
+                    loss.backward()
+                    self.optimizer.step()
                 
                     total_loss += loss.item()
                 steps_per_episode += 1
