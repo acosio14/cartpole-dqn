@@ -15,8 +15,7 @@ def main():
     parser.add_argument("--plot", action="store_true", help="Plot RL figures.")
     parser.add_argument("--output_dir", type=str, help="Directory to save trained models.")
     parser.add_argument("--animation", action="store_true", help="Show animation of Cart Pole.")
-    parser.add_argument("--load", help="Load a model.")
-    parser.add_argument("--run", help="Run inferance model.")
+    parser.add_argument("--evaluate", help="Evaluate a model.")
 
     args = parser.parse_args()
     
@@ -68,29 +67,7 @@ def main():
             results_dir = Path(args.output_dir)
             my_trainer.save_model(results_dir.resolve(), 'cartpole_rk4')
     
-
-        if args.plot:
-
-            cartpole_plots = plots(
-                my_trainer.reward_per_episode,
-                my_trainer.steps_per_episode,
-                my_trainer.loss_per_episode,
-                my_trainer.epsilon_per_episode
-            )
-
-            # make this into a plot arg with option: reward, loss, epsilon, step (default: reward)
-            plt.figure(1)
-            cartpole_plots.plot_epsilon()
-            plt.figure(2)
-            cartpole_plots.plot_learning_curve_moving_avg(window_size=50)
-            plt.figure(3)
-            cartpole_plots.plot_loss_moving_avg(window_size=50)
-            plt.figure(4)
-            cartpole_plots.plot_step_moving_avg(window_size=50)
-            
-            plt.show()
-    
-    if args.load:
+    if args.evaluate:
         loaded_policy = DQN(network_input_dim, network_output_dim)
 
         model_file = Path(args.load).resolve()
@@ -98,6 +75,29 @@ def main():
             torch.load(model_file, weights_only=True)
         )
         loaded_policy.eval()
+
+        # Run using evaluate.py -> evaluation env
+        # Should also have rendering / animation flag
     
+    if args.plot:
+
+        cartpole_plots = plots( # this need to be for train and eval
+            my_trainer.reward_per_episode,
+            my_trainer.steps_per_episode,
+            my_trainer.loss_per_episode,
+            my_trainer.epsilon_per_episode
+        )
+
+        # make this into a plot arg with option: reward, loss, epsilon, step (default: reward)
+        plt.figure(1)
+        cartpole_plots.plot_epsilon()
+        plt.figure(2)
+        cartpole_plots.plot_learning_curve_moving_avg(window_size=50)
+        plt.figure(3)
+        cartpole_plots.plot_loss_moving_avg(window_size=50)
+        plt.figure(4)
+        cartpole_plots.plot_step_moving_avg(window_size=50)
+        
+        plt.show()
 if __name__ == "__main__":
     main()
