@@ -90,5 +90,14 @@ def main():
             
             plt.show()
     
+    if args.load:
+        loaded_policy = DQN(network_input_dim, network_output_dim)
+
+        model_file = Path(args.load).resolve()
+        loaded_policy.load_state_dict(
+            torch.load(model_file, weights_only=True)
+        )
+        loaded_policy.eval()
+    
 if __name__ == "__main__":
     main()
