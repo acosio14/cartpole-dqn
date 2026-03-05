@@ -4,12 +4,10 @@ from dqn_agent.agent import CartPoleAgent
 from utils.replay_buffer import ReplayBuffer
 import torch
 from dataclasses import dataclass
-from datetime import datetime
-from pathlib import Path
+
 import numpy as np
 from tqdm import tqdm
 from torch.nn import functional as F
-from torch.optim import Optimizer
 
 @dataclass
 class TrainingArgs:
@@ -18,8 +16,6 @@ class TrainingArgs:
     batch_size: int
     target_update_freq: int
     replay_buffer_size: int
-    optimizer: Optimizer
-    learning_rate: float
 
 class Trainer():
     def __init__(
@@ -38,11 +34,7 @@ class Trainer():
         self.batch_size = training_args.batch_size
         self.target_update_freq = training_args.target_update_freq
         self.replay_buffer_size = training_args.replay_buffer_size
-        self.learning_rate = training_args.learning_rate
-        self.optimizer = training_args.optimizer(
-            params=self.agent.policy_network.parameters(), 
-            lr=self.learning_rate,
-        )
+
         self.reward_per_episode = []
         self.epsilon_per_episode = []
         self.loss_per_episode = []
@@ -84,14 +76,9 @@ class Trainer():
 
                     batch = list(zip(*memory.sample(self.batch_size)))
 
-                    q_values, target_q_values = self.agent.update_q_values(batch)
+                    loss = self.agent.learn(batch)
 
-                    loss = F.mse_loss(q_values, target_q_values)
-                    self.optimizer.zero_grad()
-                    loss.backward()
-                    self.optimizer.step()
-                
-                    total_loss += loss.item()
+                    total_loss += loss
                 steps_per_episode += 1
                 # Update target network periodically
                 total_steps += 1
@@ -105,13 +92,3 @@ class Trainer():
             self.epsilon_per_episode.append(self.agent.epsilon)
 
     
-    def save_model(self, full_path: str, name: str):
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f'{name}_{timestamp}.pt'
-
-        torch.save(
-            self.model.state_dict(),
-            full_path / filename
-        )
-
-        print(f'Model Saved: "{filename}"') 

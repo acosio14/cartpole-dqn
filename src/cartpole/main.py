@@ -1,6 +1,8 @@
 from dqn_agent.agent import CartPoleAgent
 from envs.cartpole_env import CartPoleEnv
 from dqn_agent.network import DQN
+from torch.nn import functional as F
+import torch.nn as nn
 from training.trainer import TrainingArgs, Trainer
 from utils.visualization import RLPlots as plots
 import matplotlib.pyplot as plt
@@ -8,6 +10,7 @@ from pathlib import Path
 import yaml
 import torch
 import argparse
+
 
 def main():
     parser = argparse.ArgumentParser(description="Non-Linear Cart Pole RL Problem.")
@@ -36,17 +39,27 @@ def main():
         network_input_dim = len(cartpole_env.observation_space.spaces)
         network_output_dim = cartpole_env.action_space.n
         
-        policy = DQN(network_input_dim, network_output_dim)
-        target = DQN(network_input_dim, network_output_dim)
+        policy_net = DQN(network_input_dim, network_output_dim)
+        target_net = DQN(network_input_dim, network_output_dim)
+
+        optimizer = (
+            torch.optim.Adam(
+                policy_net.parameters(),
+                config['learning_rate'],
+            ),
+        )
+        loss_function = nn.MSELoss()
 
         cartpole_agent = CartPoleAgent(
             cartpole_env,
-            policy, 
-            target,
+            policy_net, 
+            target_net,
             start_epsilon = config['start_epsilon'],
             epsilon_min = config['epsilon_min'],
             epsilon_decay_rate = config['epsilon_decay_rate'],
             discount_factor = config['discount_factor'], 
+            optimizer = optimizer,
+            loss_function = loss_function,  
         )
 
         training_args = TrainingArgs(
@@ -55,11 +68,9 @@ def main():
                             batch_size = config['batch_size'],
                             target_update_freq = config['target_update_freq'],
                             replay_buffer_size = config['replay_buffer_size'],
-                            optimizer = torch.optim.Adam,
-                            learning_rate = config['learning_rate'],
                         )
         
-        my_trainer = Trainer(policy, cartpole_env, cartpole_agent, training_args)
+        my_trainer = Trainer(policy_net, cartpole_env, cartpole_agent, training_args)
 
         my_trainer.train()
         

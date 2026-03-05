@@ -1,9 +1,13 @@
 import numpy as np
 import torch
-
+from torch import Tensor
+from torch.optim import Optimizer
 import gymnasium as gym
 from dqn_agent.network import DQN
-
+from torch.nn import functional as F
+from typing import Callable, Sequence, Tuple, Any
+from datetime import datetime
+from pathlib import Path
 
 class CartPoleAgent():
     def __init__(
@@ -15,6 +19,8 @@ class CartPoleAgent():
             epsilon_min: float,
             epsilon_decay_rate: float,
             discount_factor: float,
+            optimizer: Optimizer,
+            loss_function: Callable[[Tensor, Tensor], Tensor],
         ):
         self.env = env
         self.policy_network = policy_network
@@ -23,9 +29,11 @@ class CartPoleAgent():
         self.epsilon_min = epsilon_min
         self.decay_rate = epsilon_decay_rate
         self.discount_factor = discount_factor
+        self.loss_function = loss_function
+        self.optimizer = optimizer
     
-    def select_action(self, state):
-        """ Selection action based on epsilon and Q values."""
+    def select_action(self, state: np.ndarray) -> int:
+        """ Selection action using epsilon-greedy policy."""
         
         if np.random.random() < self.epsilon:
             action = self.env.action_space.sample() # action_space = [0, 1, 2, 3, 4] mapped to [-10, -5, 0, 5, 10]
@@ -36,8 +44,8 @@ class CartPoleAgent():
 
         return action
 
-    def update_q_values(self, batch):
-
+    def learn(self, batch: Sequence[Tuple[Any, Any, Any, Any, Any]]) -> float:
+        """Perform learning step."""
         state = torch.tensor(np.array(batch[0]), dtype=torch.float32)
         action = torch.tensor(batch[1]).long().unsqueeze(1)
         reward = torch.tensor(batch[2], dtype=torch.float32)
@@ -45,16 +53,32 @@ class CartPoleAgent():
         terminated = torch.tensor(batch[4], dtype=torch.float32)
 
         with torch.no_grad():
-            max_q_values = self.target_network(next_state).max(1)[0] # A batch of values
+            max_q_values = torch.max(self.target_network(next_state), dim=1)[0] # A batch of values
             target_q_values = reward + self.discount_factor * max_q_values * (1 - terminated)
         
-        q_values =  self.policy_network(state).gather(1,action).squeeze(1)
+        q_values =  torch.gather(self.policy_network(state), 1, action).squeeze(1)
 
-        return q_values, target_q_values
+        loss = self.loss_function(q_values, target_q_values)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
-    def update_target_network(self, steps, update_frequency):
+        return loss.item()
+
+    def update_target_network(self, steps: int, update_frequency: int) -> None:
         if steps % update_frequency == 0:
             self.target_network.load_state_dict(self.policy_network.state_dict())
 
-    def decay_epsilon(self):
+    def decay_epsilon(self) -> float:
         return max(self.decay_rate * self.epsilon, self.epsilon_min)
+
+    def save_model(self, full_path: str, name: str):
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f'{name}_{timestamp}.pt'
+
+        torch.save(
+            self.policy_network.state_dict(),
+            full_path / filename
+        )
+
+        print(f'Model Saved: "{filename}"') 
