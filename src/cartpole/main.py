@@ -42,11 +42,9 @@ def main():
         policy_net = DQN(network_input_dim, network_output_dim)
         target_net = DQN(network_input_dim, network_output_dim)
 
-        optimizer = (
-            torch.optim.Adam(
+        optimizer = torch.optim.Adam(
                 policy_net.parameters(),
                 config['learning_rate'],
-            ),
         )
         loss_function = nn.MSELoss()
 

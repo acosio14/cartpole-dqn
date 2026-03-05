@@ -4,10 +4,8 @@ from torch import Tensor
 from torch.optim import Optimizer
 import gymnasium as gym
 from dqn_agent.network import DQN
-from torch.nn import functional as F
 from typing import Callable, Sequence, Tuple, Any
 from datetime import datetime
-from pathlib import Path
 
 class CartPoleAgent():
     def __init__(
