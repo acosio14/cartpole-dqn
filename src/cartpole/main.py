@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 import torch
 import argparse
+from evaluation.evaluate import Evaluator
 
 
 def main():
@@ -48,8 +49,9 @@ def main():
         )
         loss_function = nn.MSELoss()
 
+        # agent_args = 
+        
         cartpole_agent = CartPoleAgent(
-            cartpole_env,
             policy_net, 
             target_net,
             start_epsilon = config['start_epsilon'],
@@ -77,13 +79,16 @@ def main():
             cartpole_agent.save_model(results_dir.resolve(), 'cartpole_rk4')
     
     if args.evaluate:
+        
+        model_file = Path(args.evaluate).resolve()
         loaded_policy = DQN(network_input_dim, network_output_dim)
+        eval_agent = CartPoleAgent(loaded_policy, evaluate=True)
+        my_evaluator = Evaluator(cartpole_env, eval_agent, episode=10, time_step=0.01)
 
-        model_file = Path(args.load).resolve()
-        loaded_policy.load_state_dict(
-            torch.load(model_file, weights_only=True)
-        )
-        loaded_policy.eval()
+        my_evaluator.load(model_file)
+        my_evaluator.evaluate()
+        my_evaluator.metrics()
+
 
         # Run using evaluate.py -> evaluation env
         # Should also have rendering / animation flag

@@ -10,17 +10,16 @@ from datetime import datetime
 class CartPoleAgent():
     def __init__(
             self,
-            env: gym.Env,
             policy_network: DQN,
-            target_network: DQN,
-            start_epsilon: float,
-            epsilon_min: float,
-            epsilon_decay_rate: float,
-            discount_factor: float,
-            optimizer: Optimizer,
-            loss_function: Callable[[Tensor, Tensor], Tensor],
-        ):
-        self.env = env
+            target_network: DQN = None,
+            start_epsilon: float = None,
+            epsilon_min: float = None,
+            epsilon_decay_rate: float = None,
+            discount_factor: float = None,
+            optimizer: Optimizer = None,
+            loss_function: Callable[[Tensor, Tensor], Tensor] = None,
+            evaluate: bool = False,
+    ) -> None:
         self.policy_network = policy_network
         self.target_network = target_network
         self.epsilon = start_epsilon
@@ -29,12 +28,13 @@ class CartPoleAgent():
         self.discount_factor = discount_factor
         self.loss_function = loss_function
         self.optimizer = optimizer
+        self.evaluate = evaluate
     
-    def select_action(self, state: np.ndarray) -> int:
+    def select_action(self, state: np.ndarray, env: gym.Env) -> int:
         """ Selection action using epsilon-greedy policy."""
         
         if np.random.random() < self.epsilon:
-            action = self.env.action_space.sample() # action_space = [0, 1, 2, 3, 4] mapped to [-10, -5, 0, 5, 10]
+            action = env.action_space.sample() # action_space = [0, 1, 2, 3, 4] mapped to [-10, -5, 0, 5, 10]
         else:
             state = torch.tensor(state, dtype=torch.float32)
             q_values = self.policy_network(state) # returns (values, indicies)

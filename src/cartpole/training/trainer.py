@@ -55,7 +55,7 @@ class Trainer():
 
             while not terminated:
                 # Select action
-                action = self.agent.select_action(state)
+                action = self.agent.select_action(state, self.environment)
 
                 #step takes (action,time,timestep) - What is time and timestep?
                 next_state, reward, terminated, *_ = (
