@@ -20,12 +20,10 @@ class TrainingArgs:
 class Trainer():
     def __init__(
         self,
-        model: DQN,
         environment: CartPoleEnv, 
         agent: CartPoleAgent,
         training_args: TrainingArgs,
     ):
-        self.model = model
         self.environment = environment
         self.agent = agent
 
@@ -90,5 +88,3 @@ class Trainer():
             self.loss_per_episode.append(total_loss/steps_per_episode)
             self.reward_per_episode.append(episode_reward)
             self.epsilon_per_episode.append(self.agent.epsilon)
-
-    
