@@ -3,6 +3,7 @@ from dqn_agent.agent import CartPoleAgent
 from dqn_agent.network import DQN
 import torch
 from tqdm import tqdm
+from typing import List
 
 class Evaluator():
     def __init__(
@@ -25,8 +26,10 @@ class Evaluator():
         )
         self.loaded_policy.eval()
     
-    def evaluate(self):
-
+    def evaluate(self, seed: int):
+        self.environment.reset(seed)
+        torch.manual_seed(seed)
+        
         for episode in tqdm(range(self.episodes),ncols=100,desc="Episodes"):
             state = self.environment.reset()
             episode_reward = 0

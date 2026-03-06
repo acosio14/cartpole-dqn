@@ -16,6 +16,7 @@ from evaluation.evaluate import Evaluator
 def main():
     parser = argparse.ArgumentParser(description="Non-Linear Cart Pole RL Problem.")
     parser.add_argument("--train", help="Train Cart Pole model.")
+    parser.add_argument("--seeds", nargs="*", default=42, type=int, help="Set seed(s) for repeatable runs.")
     parser.add_argument("--plot", action="store_true", help="Plot RL figures.")
     parser.add_argument("--output_dir", type=str, help="Directory to save trained models.")
     parser.add_argument("--animation", action="store_true", help="Show animation of Cart Pole.")
@@ -72,11 +73,15 @@ def main():
         
         my_trainer = Trainer(cartpole_env, cartpole_agent, training_args)
 
-        my_trainer.train()
+        if type(args.seeds) is not list:
+            args.seeds = [args.seeds]
+
+        for seed in args.seeds:
+            my_trainer.train(seed)
         
-        if args.output_dir:
-            results_dir = Path(args.output_dir)
-            cartpole_agent.save_model(results_dir.resolve(), 'cartpole_rk4')
+            if args.output_dir:
+                results_dir = Path(args.output_dir)
+                cartpole_agent.save_model(results_dir.resolve(), f'cartpole_rk4_seed_{seed}')
     
     if args.evaluate:
         
@@ -86,6 +91,7 @@ def main():
         my_evaluator = Evaluator(cartpole_env, eval_agent, episode=10, time_step=0.01)
 
         my_evaluator.load(model_file)
+        
         my_evaluator.evaluate()
         my_evaluator.metrics()
 

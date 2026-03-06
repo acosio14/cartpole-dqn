@@ -4,10 +4,11 @@ from dqn_agent.agent import CartPoleAgent
 from utils.replay_buffer import ReplayBuffer
 import torch
 from dataclasses import dataclass
-
+from typing import List
 import numpy as np
 from tqdm import tqdm
 from torch.nn import functional as F
+import random
 
 @dataclass
 class TrainingArgs:
@@ -39,11 +40,15 @@ class Trainer():
         self.steps_per_episode = []
 
     
-    def train(self):
+    def train(self, seed: int):
+        np.random.seed(seed)
+        random.seed(seed)
+        torch.manual_seed(seed)
+        self.environment.reset(seed)
+        self.environment.action_space.seed(seed)
 
         memory = ReplayBuffer(self.replay_buffer_size)
         total_steps = 0
-
         for episode in tqdm(range(self.episodes),ncols=100,desc="Episodes"):
             state = self.environment.reset()
             episode_reward = 0

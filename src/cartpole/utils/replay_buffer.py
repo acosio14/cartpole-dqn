@@ -2,10 +2,11 @@ from collections import deque
 import random
 
 class ReplayBuffer(deque):
-    def __init__(self, buffer_length):
+    def __init__(self, buffer_length: int):
         super().__init__(maxlen=buffer_length)
         self.buffer_length = buffer_length
         self.is_full = False
+
 
     def sample(self, batch_size):
         if len(self) == 0:
