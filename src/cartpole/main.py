@@ -68,7 +68,7 @@ def main():
                             replay_buffer_size = config['replay_buffer_size'],
                         )
         
-        my_trainer = Trainer(policy_net, cartpole_env, cartpole_agent, training_args)
+        my_trainer = Trainer(cartpole_env, cartpole_agent, training_args)
 
         my_trainer.train()
         
