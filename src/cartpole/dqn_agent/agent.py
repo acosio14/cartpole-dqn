@@ -33,7 +33,7 @@ class CartPoleAgent():
     def select_action(self, state: np.ndarray, env: gym.Env) -> int:
         """ Selection action using epsilon-greedy policy."""
         
-        if np.random.random() < self.epsilon:
+        if np.random.random() < self.epsilon and self.evaluate is False:
             action = env.action_space.sample() # action_space = [0, 1, 2, 3, 4] mapped to [-10, -5, 0, 5, 10]
         else:
             state = torch.tensor(state, dtype=torch.float32)
