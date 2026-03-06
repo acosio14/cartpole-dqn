@@ -74,7 +74,7 @@ def main():
         
         if args.output_dir:
             results_dir = Path(args.output_dir)
-            my_trainer.save_model(results_dir.resolve(), 'cartpole_rk4')
+            cartpole_agent.save_model(results_dir.resolve(), 'cartpole_rk4')
     
     if args.evaluate:
         loaded_policy = DQN(network_input_dim, network_output_dim)
