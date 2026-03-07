@@ -12,6 +12,7 @@ import torch
 import argparse
 from evaluation import evaluate
 from typing import List
+import numpy as np
 
 def main():
     parser = argparse.ArgumentParser(description="Non-Linear Cart Pole RL Problem.")
@@ -41,7 +42,7 @@ def main():
 
         network_input_dim = len(cartpole_env.observation_space.spaces)
         network_output_dim = cartpole_env.action_space.n
-        
+
         policy_net = DQN(network_input_dim, network_output_dim)
         target_net = DQN(network_input_dim, network_output_dim)
 
@@ -52,7 +53,7 @@ def main():
         loss_function = nn.MSELoss()
 
         # agent_args = 
-        
+
         cartpole_agent = CartPoleAgent(
             policy_net, 
             target_net,
@@ -87,15 +88,54 @@ def main():
     if not isinstance(args.eval_seeds, list):
         raise TypeError("Missing Evaluation Seed(s).")
     
-    for file, seed in zip(args.evaluate, args.eval_seeds):
-        
-        model_file = Path(file).resolve()
-        eval_network = DQN(network_input_dim, network_output_dim)
-        eval_agent = CartPoleAgent(eval_network, evaluate=True)
+    model_metrics = []
+    for file in args.evaluate:
+        # For evaluation don't touch the training randomness(seed them).
+        # For evaluation I currently have 1 seed per model when it should be
+        # multiple seeds per each model.
+        # Basically, I train per seeds -> get train_seed1, train_seed2
+        # then I evaluate train_seed1 with seed 11, 12. To test that ONE model
+        # So I'm getting multiple models evaluating each one with multiple seeds.
+        # Get the average for each model, then the average across models
 
-        evaluate.load(model_file)
-        evaluate.evaluate(eval_agent, cartpole_env, episode=10, time_step=0.01, seed=seed)
-        evaluate.metrics()
+        # Final Report:
+        # Model A rewards per seed = [1,2,3] => average reward for model 10
+        # Model B rewards per seed = [2,3,4] => average reward for model 11
+        # Overall across all models, average reward is (10+11)/2 = Value
+        
+
+        eval_network = DQN(network_input_dim, network_output_dim)
+        model_file = Path(file).resolve()
+        evaluation_policy = evaluate.load(eval_network, model_file)
+
+        eval_agent = CartPoleAgent(
+            evaluation_policy, 
+            evaluate=True,
+        )
+        all_seeds = []
+        for seed in args.seeds:
+            seed_mean, seed_std = (
+                evaluate.evaluate(
+                    eval_agent,
+                    cartpole_env,
+                    episode=10,
+                    time_step=0.01,
+                    seed=seed
+                )
+            )
+            all_seeds.append((seed_mean,seed_std))
+        
+        model_means, model_stds = zip(*all_seeds)
+        model_mean = np.mean(model_means)
+        model_std = np.mean(model_stds)
+        
+        model_metrics.append((model_mean,model_std))
+
+    eval_means, eval_stds = zip(*model_metrics)
+    
+    final_mean = np.mean(eval_means)
+    final_std = np.mean(eval_stds)
+
 
         # Should also have rendering / animation flag
     
