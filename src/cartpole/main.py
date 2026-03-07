@@ -10,18 +10,19 @@ from pathlib import Path
 import yaml
 import torch
 import argparse
-from evaluation.evaluate import Evaluator
-
+from evaluation import evaluate
+from typing import List
 
 def main():
     parser = argparse.ArgumentParser(description="Non-Linear Cart Pole RL Problem.")
-    parser.add_argument("--train", help="Train Cart Pole model.")
-    parser.add_argument("--seeds", nargs="*", default=42, type=int, help="Set seed(s) for repeatable runs.")
+    parser.add_argument("--train", help="Train Cart Pole model (input: config YAML file).")
+    parser.add_argument("--train_seeds", nargs="+", type=int, help="Set seed(s) for training runs.")
     parser.add_argument("--plot", action="store_true", help="Plot RL figures.")
     parser.add_argument("--output_dir", type=str, help="Directory to save trained models.")
     parser.add_argument("--animation", action="store_true", help="Show animation of Cart Pole.")
-    parser.add_argument("--evaluate", help="Evaluate a model.")
-
+    parser.add_argument("--evaluate", nargs="+", help="Evaluate model(s).")
+    parser.add_argument("--eval_seeds", nargs="+", type=int, help="Set seed(s) for evaluation runs.")
+    
     args = parser.parse_args()
     
     if args.train:
@@ -73,30 +74,29 @@ def main():
         
         my_trainer = Trainer(cartpole_env, cartpole_agent, training_args)
 
-        if type(args.seeds) is not list:
-            args.seeds = [args.seeds]
+        if not isinstance(args.train_seeds, list):
+            raise ValueError("Missing Training Seed(s).")
 
-        for seed in args.seeds:
+        for seed in args.train_seeds:
             my_trainer.train(seed)
         
             if args.output_dir:
                 results_dir = Path(args.output_dir)
                 cartpole_agent.save_model(results_dir.resolve(), f'cartpole_rk4_seed_{seed}')
+
+    if not isinstance(args.eval_seeds, list):
+        raise ValueError("Missing Evaluation Seed(s).")
     
-    if args.evaluate:
+    for file, seed in zip(args.evaluate, args.eval_seeds):
         
-        model_file = Path(args.evaluate).resolve()
-        loaded_policy = DQN(network_input_dim, network_output_dim)
-        eval_agent = CartPoleAgent(loaded_policy, evaluate=True)
-        my_evaluator = Evaluator(cartpole_env, eval_agent, episode=10, time_step=0.01)
+        model_file = Path(file).resolve()
+        eval_network = DQN(network_input_dim, network_output_dim)
+        eval_agent = CartPoleAgent(eval_network, evaluate=True)
 
-        my_evaluator.load(model_file)
-        
-        my_evaluator.evaluate()
-        my_evaluator.metrics()
+        evaluate.load(model_file)
+        evaluate.evaluate(eval_agent, cartpole_env, episode=10, time_step=0.01, seed=seed)
+        evaluate.metrics()
 
-
-        # Run using evaluate.py -> evaluation env
         # Should also have rendering / animation flag
     
     if args.plot:
