@@ -3,7 +3,9 @@ from dqn_agent.agent import CartPoleAgent
 from dqn_agent.network import DQN
 import torch
 from tqdm import tqdm
-from typing import List
+from typing import List, Tuple
+import numpy as np
+from dataclasses import dataclass
 
 # class Evaluator():
 #     def __init__(
@@ -20,42 +22,56 @@ from typing import List
 #         self.loaded_policy: DQN = None
 #         self.reward_per_episode = []
 
-def load(self, model_file: str):
-    self.loaded_policy.load_state_dict(
-        torch.load(model_file, weights_only=True)
-    )
-    self.loaded_policy.eval()
-
-def evaluate(self, seed: int):
-    self.environment.reset(seed)
-    torch.manual_seed(seed)
+def load(dqn_network: DQN, model_file: str):
     
-    for episode in tqdm(range(self.episodes),ncols=100,desc="Episodes"):
-        state = self.environment.reset()
-        episode_reward = 0
+    state_dict = torch.load(model_file, weights_only=True)
+    dqn_network.load_state_dict(state_dict)
+
+    return dqn_network.eval()
+
+def evaluate(
+    agent: CartPoleAgent,
+    environment: CartPoleEnv,
+    episodes: int,
+    time_step: float,
+    seed: int
+) -> Tuple[np.float64, np.float64]:
+    
+    environment.reset(seed)
+    torch.manual_seed(seed)
+
+    reward_per_episode = []
+    for episode in tqdm(range(episodes),ncols=100,desc="Episodes"):
+        state = environment.reset()
+        total_reward = 0
         time = 0
 
         terminated = False
 
         while not terminated:
             # Select action
-            action = self.agent.select_action(state)
+            action = agent.select_action(state)
 
-            #step takes (action,time,timestep)
+            # Take Step
             next_state, reward, terminated, *_ = (
-                self.environment.step(state, action, time, self.time_step)
+                environment.step(state, action, time, time_step)
             )
 
             # Update state
             state = next_state
-            episode_reward += reward
+            total_reward += reward
 
             # Update target network periodically
             total_steps += 1
-            time += self.time_step
+            time += time_step
 
-        self.reward_per_episode.append(episode_reward)
+        reward_per_episode.append(total_reward)
+    
+    return np.mean(reward_per_episode), np.std(reward_per_episode)
 
-def metrics(self):
-    metric = 0
-    return metric
+def metrics(all_seeds):
+    means, stds = zip(*all_seeds)
+
+    return np.mean(means), np.mean(stds)
+
+
