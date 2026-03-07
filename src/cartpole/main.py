@@ -75,7 +75,7 @@ def main():
         my_trainer = Trainer(cartpole_env, cartpole_agent, training_args)
 
         if not isinstance(args.train_seeds, list):
-            raise ValueError("Missing Training Seed(s).")
+            raise TypeError("Missing Training Seed(s).")
 
         for seed in args.train_seeds:
             my_trainer.train(seed)
@@ -85,7 +85,7 @@ def main():
                 cartpole_agent.save_model(results_dir.resolve(), f'cartpole_rk4_seed_{seed}')
 
     if not isinstance(args.eval_seeds, list):
-        raise ValueError("Missing Evaluation Seed(s).")
+        raise TypeError("Missing Evaluation Seed(s).")
     
     for file, seed in zip(args.evaluate, args.eval_seeds):
         
