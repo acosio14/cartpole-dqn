@@ -7,20 +7,6 @@ from typing import List, Tuple
 import numpy as np
 from dataclasses import dataclass
 
-# class Evaluator():
-#     def __init__(
-#         self,
-#         environment: CartPoleEnv, 
-#         agent: CartPoleAgent,
-#         episodes: int,
-#         time_step: float,
-#     ):
-#         self.environment = environment
-#         self.agent = agent
-#         self.episodes = episodes
-#         self.time_step = time_step
-#         self.loaded_policy: DQN = None
-#         self.reward_per_episode = []
 
 def load(dqn_network: DQN, model_file: str):
     

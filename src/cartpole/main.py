@@ -132,7 +132,6 @@ def main():
         model_metrics.append((model_mean,model_std))
 
     eval_means, eval_stds = zip(*model_metrics)
-    
     final_mean = np.mean(eval_means)
     final_std = np.mean(eval_stds)
 
