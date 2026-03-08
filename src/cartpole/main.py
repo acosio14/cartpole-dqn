@@ -102,7 +102,15 @@ def main():
         # Model A rewards per seed = [1,2,3] => average reward for model 10
         # Model B rewards per seed = [2,3,4] => average reward for model 11
         # Overall across all models, average reward is (10+11)/2 = Value
-        
+        cartpole_env = CartPoleEnv(
+            gravity=9.8,
+            cart_mass=10,
+            pole_mass=5,
+            pole_length=3,
+        )
+
+        network_input_dim = len(cartpole_env.observation_space.spaces)
+        network_output_dim = cartpole_env.action_space.n
 
         eval_network = DQN(network_input_dim, network_output_dim)
         model_file = Path(file).resolve()
@@ -113,12 +121,12 @@ def main():
             evaluate=True,
         )
         all_seeds = []
-        for seed in args.seeds:
+        for seed in args.eval_seeds:
             seed_mean, seed_std = (
                 evaluate.evaluate(
                     eval_agent,
                     cartpole_env,
-                    episode=10,
+                    episodes=10,
                     time_step=0.01,
                     seed=seed
                 )
@@ -132,9 +140,15 @@ def main():
         model_metrics.append((model_mean,model_std))
 
     eval_means, eval_stds = zip(*model_metrics)
-    final_mean = np.mean(eval_means)
-    final_std = np.mean(eval_stds)
+    overall_mean = np.mean(eval_means)
+    overall_std = np.mean(eval_stds)
 
+    print("\CartPole Performance")
+
+    #print(f"Model mean: {list_model_mean}") # list of means for each model
+    #print(f"Model std: {list_model_std}")
+
+    print(f"Overall mean: {round(overall_mean,2)}, Overall std: {round(overall_std,2)}")
 
         # Should also have rendering / animation flag
     
