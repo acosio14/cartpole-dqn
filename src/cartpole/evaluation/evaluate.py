@@ -36,7 +36,7 @@ def evaluate(
 
         while not terminated:
             # Select action
-            action = agent.select_action(state)
+            action = agent.select_action(state, environment)
 
             # Take Step
             next_state, reward, terminated, *_ = (
@@ -48,7 +48,6 @@ def evaluate(
             total_reward += reward
 
             # Update target network periodically
-            total_steps += 1
             time += time_step
 
         reward_per_episode.append(total_reward)
