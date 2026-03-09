@@ -90,18 +90,6 @@ def main():
     
     model_metrics = []
     for file in args.evaluate:
-        # For evaluation don't touch the training randomness(seed them).
-        # For evaluation I currently have 1 seed per model when it should be
-        # multiple seeds per each model.
-        # Basically, I train per seeds -> get train_seed1, train_seed2
-        # then I evaluate train_seed1 with seed 11, 12. To test that ONE model
-        # So I'm getting multiple models evaluating each one with multiple seeds.
-        # Get the average for each model, then the average across models
-
-        # Final Report:
-        # Model A rewards per seed = [1,2,3] => average reward for model 10
-        # Model B rewards per seed = [2,3,4] => average reward for model 11
-        # Overall across all models, average reward is (10+11)/2 = Value
         cartpole_env = CartPoleEnv(
             gravity=9.8,
             cart_mass=10,
@@ -135,13 +123,13 @@ def main():
         
         model_means, model_stds = zip(*all_seeds)
         model_mean = np.mean(model_means)
-        model_std = np.std(model_means, ddof=1)
+        model_std = np.std(model_means)
         
         model_metrics.append((model_mean,model_std))
 
     eval_means, eval_stds = zip(*model_metrics)
     overall_mean = np.mean(eval_means)
-    overall_std = np.std(eval_means, ddof=1)
+    overall_std = np.std(eval_means)
     
     if len(args.evaluate) < 2:
         overall_mean = float(*eval_means)
