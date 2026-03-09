@@ -135,22 +135,29 @@ def main():
         
         model_means, model_stds = zip(*all_seeds)
         model_mean = np.mean(model_means)
-        model_std = np.mean(model_stds)
+        model_std = np.std(model_means, ddof=1)
         
         model_metrics.append((model_mean,model_std))
 
     eval_means, eval_stds = zip(*model_metrics)
     overall_mean = np.mean(eval_means)
-    overall_std = np.mean(eval_stds)
+    overall_std = np.std(eval_means, ddof=1)
+    
+    if len(args.evaluate) < 2:
+        overall_mean = float(*eval_means)
+        overall_std = float(*eval_stds)
+        eval_means = model_means
+        eval_stds = model_stds
 
-    print("\CartPole Performance")
+    
+    print("\nCart Pole Performance")
 
-    #print(f"Model mean: {list_model_mean}") # list of means for each model
-    #print(f"Model std: {list_model_std}")
+    print(f"Model means: {[float(seed_mean) for seed_mean in eval_means]}") # list of means for each model
+    print(f"Model stds: {[round(float(seed_std),2) for seed_std in eval_stds]}")
 
     print(f"Overall mean: {round(overall_mean,2)}, Overall std: {round(overall_std,2)}")
 
-        # Should also have rendering / animation flag
+    # Should also have rendering / animation flag
     
     if args.plot:
 
