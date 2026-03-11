@@ -1,11 +1,16 @@
-# CartPole Deep Q-Network
-Goal: Train a Deep Q-Network that can balance a CartPole.
+# Cart-Pole Deep Q-Network
+Goal: Train a Deep Q-Network that can balance a Cart-Pole.
 
-Outcome:
-Agent consistently scores 400+
+# Summary
 
-I understand:
-- replay buffer
-- target network
-- epsilon-greedy
+
+# What I Learned
+
   
+# Future Work
+- Add rendering to Cart Pole Environment to view animation.
+- Create docker containerization.
+- Find the best hyper-parameters.
+- Compare trained policies against a basiline random policy.
+- Improve visualization of plots.
+- Add logging.
