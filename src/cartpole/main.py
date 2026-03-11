@@ -52,8 +52,6 @@ def main():
         )
         loss_function = nn.MSELoss()
 
-        # agent_args = 
-
         cartpole_agent = CartPoleAgent(
             policy_net, 
             target_net,
@@ -137,15 +135,12 @@ def main():
         eval_means = model_means
         eval_stds = model_stds
 
-    
     print("\nCart Pole Performance")
 
     print(f"Model means: {[float(seed_mean) for seed_mean in eval_means]}") # list of means for each model
     print(f"Model stds: {[round(float(seed_std),2) for seed_std in eval_stds]}")
 
     print(f"Overall mean: {round(overall_mean,2)}, Overall std: {round(overall_std,2)}")
-
-    # Should also have rendering / animation flag
     
     if args.plot:
 
@@ -167,5 +162,7 @@ def main():
         cartpole_plots.plot_step_moving_avg(window_size=50)
         
         plt.show()
+
+
 if __name__ == "__main__":
     main()
