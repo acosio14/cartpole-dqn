@@ -54,6 +54,8 @@ Through the creation of this project, I learned the following:
 - How the size of the replay buffer affects the agent’s ability to sample diverse state-action experiences during learning.
 
 ## Future Work
+- Add docstrings to all Classes and functions.
+- Use ruff linter to properly format code.
 - Add rendering to the Cart-Pole environment to visualize the animation.
 - Create Docker containerization.
 - Perform hyperparameter tuning to find the best configuration.
