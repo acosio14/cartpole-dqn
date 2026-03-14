@@ -73,8 +73,9 @@ def main():
         
         my_trainer = Trainer(cartpole_env, cartpole_agent, training_args)
 
-        if not isinstance(args.train_seeds, list):
-            raise TypeError("Missing Training Seed(s).")
+        if args.train_seeds is None:
+            args.train_seeds = [42]
+            print(f"No train seed. Defaulting to {args.train_seeds[0]}.")
 
         for seed in args.train_seeds:
             my_trainer.train(seed)
@@ -82,66 +83,68 @@ def main():
             if args.output_dir:
                 results_dir = Path(args.output_dir)
                 cartpole_agent.save_model(results_dir.resolve(), f'cartpole_rk4_seed_{seed}')
-
-    if not isinstance(args.eval_seeds, list):
-        raise TypeError("Missing Evaluation Seed(s).")
     
-    model_metrics = []
-    for file in args.evaluate:
-        cartpole_env = CartPoleEnv(
-            gravity=9.8,
-            cart_mass=10,
-            pole_mass=5,
-            pole_length=3,
-        )
-
-        network_input_dim = len(cartpole_env.observation_space.spaces)
-        network_output_dim = cartpole_env.action_space.n
-
-        eval_network = DQN(network_input_dim, network_output_dim)
-        model_file = Path(file).resolve()
-        evaluation_policy = evaluate.load(eval_network, model_file)
-
-        eval_agent = CartPoleAgent(
-            evaluation_policy, 
-            evaluate=True,
-        )
-        all_seeds = []
-        for seed in args.eval_seeds:
-            seed_mean, seed_std = (
-                evaluate.evaluate(
-                    eval_agent,
-                    cartpole_env,
-                    episodes=10,
-                    time_step=0.01,
-                    seed=seed
-                )
+    if args.evaluate:
+        if args.eval_seeds is None:
+            args.eval_seeds = [43, 44, 45]
+            print(f"No evaluation seeds. Defaulting to {args.eval_seeds}.")
+        
+        model_metrics = []
+        for file in args.evaluate:
+            cartpole_env = CartPoleEnv(
+                gravity=9.8,
+                cart_mass=10,
+                pole_mass=5,
+                pole_length=3,
             )
-            all_seeds.append((seed_mean,seed_std))
+
+            network_input_dim = len(cartpole_env.observation_space.spaces)
+            network_output_dim = cartpole_env.action_space.n
+
+            eval_network = DQN(network_input_dim, network_output_dim)
+            model_file = Path(file).resolve()
+            evaluation_policy = evaluate.load(eval_network, model_file)
+
+            eval_agent = CartPoleAgent(
+                evaluation_policy, 
+                evaluate=True,
+            )
+            all_seeds = []
+            for seed in args.eval_seeds:
+                seed_mean, seed_std = (
+                    evaluate.evaluate(
+                        eval_agent,
+                        cartpole_env,
+                        episodes=10,
+                        time_step=0.01,
+                        seed=seed
+                    )
+                )
+                all_seeds.append((seed_mean,seed_std))
+            
+            model_means, model_stds = zip(*all_seeds)
+            model_mean = np.mean(model_means)
+            model_std = np.std(model_means)
+            
+            model_metrics.append((model_mean,model_std))
+
+        eval_means, eval_stds = zip(*model_metrics)
+        overall_mean = np.mean(eval_means)
+        overall_std = np.std(eval_means)
         
-        model_means, model_stds = zip(*all_seeds)
-        model_mean = np.mean(model_means)
-        model_std = np.std(model_means)
+        if len(args.evaluate) < 2:
+            overall_mean = float(*eval_means)
+            overall_std = float(*eval_stds)
+            eval_means = model_means
+            eval_stds = model_stds
+
+        print("\nCart Pole Performance")
+
+        print(f"Model means: {[float(seed_mean) for seed_mean in eval_means]}") # list of means for each model
+        print(f"Model stds: {[round(float(seed_std),2) for seed_std in eval_stds]}")
+
+        print(f"Overall mean: {round(overall_mean,2)}, Overall std: {round(overall_std,2)}")
         
-        model_metrics.append((model_mean,model_std))
-
-    eval_means, eval_stds = zip(*model_metrics)
-    overall_mean = np.mean(eval_means)
-    overall_std = np.std(eval_means)
-    
-    if len(args.evaluate) < 2:
-        overall_mean = float(*eval_means)
-        overall_std = float(*eval_stds)
-        eval_means = model_means
-        eval_stds = model_stds
-
-    print("\nCart Pole Performance")
-
-    print(f"Model means: {[float(seed_mean) for seed_mean in eval_means]}") # list of means for each model
-    print(f"Model stds: {[round(float(seed_std),2) for seed_std in eval_stds]}")
-
-    print(f"Overall mean: {round(overall_mean,2)}, Overall std: {round(overall_std,2)}")
-    
     if args.plot:
 
         cartpole_plots = plots( # this need to be for train and eval
