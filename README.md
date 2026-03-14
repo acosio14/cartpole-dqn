@@ -31,8 +31,8 @@ For this project, the parameters defined in the config_01.yml file were used to 
 To verify the model, an evaluation phase was performed using three different random seeds. The following metrics summarize the evaluation results:
 
 ```text
-Episode: 1000
-Timestep: 0.01
+Episodes: 1000
+Time step: 0.01
 Model means: [1069.162, 1037.043, 1049.4295]
 Model stds: [747.04, 729.04, 749.93]
 
