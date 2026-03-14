@@ -1,5 +1,5 @@
 # Cart-Pole Deep Q-Network
-Goal: Train a Deep Q-Network that can balance a Cart-Pole.
+**Goal:** Train a Deep Q-Network that can balance a Cart-Pole.
 
 ## Summary
 This project focused on recreating the classic Cart-Pole problem and solving it using Reinforcement Learning.
