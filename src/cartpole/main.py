@@ -115,7 +115,7 @@ def main():
                     evaluate.evaluate(
                         eval_agent,
                         cartpole_env,
-                        episodes=10,
+                        episodes=1000,
                         time_step=0.01,
                         seed=seed
                     )
