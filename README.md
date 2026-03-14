@@ -1,35 +1,62 @@
 # Cart-Pole Deep Q-Network
 Goal: Train a Deep Q-Network that can balance a Cart-Pole.
 
-# Summary
-This project dealt with recreating the simple Cart Pole problem and using Reinforcement Learning solve it. To review, the Cart Pole prolem is about developing a solution to keep a pole upright that is attached to a cart with wheels. This has been already solved with classic control theory, which take the route of linearizing the problem and using linear controls such as LQR to calculate the force needed to push the cart with the required force to keep the pole upright. This problem can also be solved using Reinforcement Learning. In this approach a neural network is trained to learn a policy that can be used by an agent to select the right action based on the current states of the cart-pole.
+## Summary
+This project focused on recreating the classic Cart-Pole problem and solving it using Reinforcement Learning.
 
-For my project, I decided to add some differences to the orignal problem by attempting to solve the Cart Pole problem using a non-linearized system and using a runga-kutta 4th order numerical integrator. Another difference from the classic problem was that I choose a larger action space of four different forces to push the cart. They can be described as: Hard Left, Soft Left, Soft Right, Hard Right. The classic problem only pushes the cart left or right at a constant force. I still used the same observation space of cart position and velocity and pole angle and angular velocity to be inputted into my non-linearized state space differential equations.
+To review, the Cart-Pole problem involves developing a solution to keep a pole upright while it is attached to a cart with wheels. This problem has already been solved using classical control theory, which typically approaches the problem by linearizing the system and applying linear control methods such as LQR to calculate the force required to keep the pole upright.
 
-Within this project I developed the envronment, inheriting from the gymnasium Environment class, to include my deisred observation space and action space. In it a step function was created to take in the states and action and use runge kutta to calcualte the next states. This information was used by the reward function to help the agent learn. 
+However, this problem can also be solved using Reinforcement Learning. In this approach, a neural network is trained to learn a policy that allows an agent to select the appropriate action based on the current state of the cart-pole system.
 
-Learning was done by a 3 layer neural network in combination with the bellman's equation. This lead to calculating Q values, which represent scores for the action taken at a particular state. It must also be mentioned that at each step the agent selected the action either through exploration, selecting a random action, or by using the learned policy that was generated with the neural network. The exploration represent the epsilon-greedy technique commonly used in these problems. It allows the agent to explore various action and find the best possilbe Q values.
+For this project, I introduced a few differences from the original problem. First, I attempted to solve the Cart-Pole problem using a **non-linearized system** and implemented a **4th-order Runge-Kutta numerical integrator** to propagate the system dynamics. Another difference from the classic problem was the use of a **larger action space** consisting of four different forces applied to the cart:
+- Hard Left
+- Soft Left
+- Soft Right
+- Hard Right
 
-The results from this project showed that the trained models were hitting rewards 
+The classic problem only allows the cart to be pushed left or right with a constant force.
 
+I still used the same observation space as the traditional problem: cart position, cart velocity, pole angle, and pole angular velocity. These values were used as inputs to the non-linear state-space differential equations that define the system dynamics.
 
-Cart Pole Performance
-Model means: [1240.5, 1089.25, 1800.0]
-Model stds: [914.24, 913.11, 337.44]
-Overall mean: 1376.58, Overall std: 305.7
+Within this project, I developed a custom environment that inherits from the Gymnasium Environment class, allowing me to define the desired observation space and action space. Inside the environment, a step function takes the current state and selected action and uses the Runge-Kutta integrator to calculate the next state of the system. This information is then used by the reward function to help the agent learn.
 
-### NEED TO WRITE:
-- How did I design my project, what files were created and why, the network architecture
-- Results of my environment. Put some plots and evaluation metrics
-- Stopping sooner that I want but give reason.
+Learning was performed using a three-layer neural network combined with Bellman’s equation to estimate Q-values. These Q-values represent the expected reward for taking a particular action in a given state.
 
-# What I Learned
+At each step, the agent selects an action either through exploration (choosing a random action) or by using the learned policy produced by the neural network. Exploration is implemented using the epsilon-greedy technique, which allows the agent to try different actions while gradually improving its policy by learning better Q-values.
 
+For this project, the parameters defined in the config_01.yml file were used to train the Cart-Pole model. Using a time step of 0.01 seconds and 1500 episodes, the agent achieved rewards as high as 1200. The plot below shows the moving average of the reward for each episode under this configuration.
 
-# Future Work
-- Add rendering to Cart Pole Environment to view animation.
-- Create docker containerization.
-- Find the best hyper-parameters.
-- Compare trained policies against a basiline random policy.
-- Improve visualization of plots.
-- Add logging.
+![Alt text](results/Plots/seed42_time01_reward.png)
+
+To verify the model, an evaluation phase was performed using three different random seeds. The following metrics summarize the evaluation results:
+
+```text
+Episode: 1000
+Timestep: 0.01
+Model means: [1069.162, 1037.043, 1049.4295]
+Model stds: [747.04, 729.04, 749.93]
+
+Overall mean: 1051.88, Overall std: 13.23
+```
+
+As shown above, the model performed relatively well, consistently averaging above 1000. The standard deviation across episodes is fairly high, which may be the result of a few episodes ending early. Despite this variability, the overall performance indicates that the model is able to balance the pole reliably.
+
+Overall, this is a solid first model that performs well and still has room for improvement through additional tuning and experimentation. For now, I am choosing to stop here because I am satisfied with the current state of the project. While there are several ways the model could be improved, I plan to move on to the next project and potentially return later to upgrade this RL Cart-Pole implementation.
+
+## What I Learned
+
+Through the creation of this project, I learned the following:
+- How to set up non-linear state-space ordinary differential equations with Runge-Kutta numerical integration.
+- How to create a custom reinforcement learning environment and agent.
+- How to implement my own replay buffer using random.sample and deque.
+- How an RL agent uses the epsilon-greedy technique along with Bellman’s equation to explore and improve its policy.
+- The importance of updating the target network correctly to provide stability during training.
+- How the size of the replay buffer affects the agent’s ability to sample diverse state-action experiences during learning.
+
+## Future Work
+- Add rendering to the Cart-Pole environment to visualize the animation.
+- Create Docker containerization.
+- Perform hyperparameter tuning to find the best configuration.
+- Compare the trained policy against a baseline random policy.
+- Improve visualization of training plots.
+- Add logging for better experiment tracking.
